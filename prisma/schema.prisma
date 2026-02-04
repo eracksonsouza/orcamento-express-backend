@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StatusOrcamento {
+  DRAFT
+  SUBMITTED
+  GENERATING
+  READY
+  FAILED
+}
+
+model Cliente {
+  id         String      @id @default(uuid())
+  nome       String
+  contato    String?
+  orcamentos Orcamento[]
+
+  @@map("clientes")
+}
+
+model Orcamento {
+  id         String          @id @default(uuid())
+  clienteId  String
+  cliente    Cliente         @relation(fields: [clienteId], references: [id])
+
+  versao     Int             @default(1)
+  status     StatusOrcamento @default(DRAFT)
+
+  // Totais (armazenar pra evitar recalcular toda hora)
+  subtotal   Decimal         @default(0)
+  desconto   Decimal         @default(0)
+  taxas      Decimal         @default(0)
+  total      Decimal         @default(0)
+
+  itens      ItemOrcamento[]
+  arquivos   ArquivoOrcamento[]
+
+  dataCriacao    DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Garantia: uma versão por vez
+  @@unique([id, versao])
+  @@map("orcamentos")
+}
+
+model ItemOrcamento {
+  id           String    @id @default(uuid())
+  orcamentoId  String
+  orcamento    Orcamento @relation(fields: [orcamentoId], references: [id])
+
+  descricao    String
+  quantidade   Int
+  precoUnitario Decimal
+  desconto     Decimal   @default(0)
+  taxas        Decimal   @default(0)
+
+  tipo         String    // "PECA" ou "SERVICO"
+
+  @@map("itens_orcamento")
+}
+
+model ArquivoOrcamento {
+  id          String    @id @default(uuid())
+  orcamentoId String
+  orcamento   Orcamento @relation(fields: [orcamentoId], references: [id])
+
+  versao      Int
+  tipoArquivo String    // "PDF" ou "XLSX"
+  url         String    // path local ou S3
+
+  dataCriacao DateTime  @default(now())
+
+  @@map("arquivos_orcamento")
+}

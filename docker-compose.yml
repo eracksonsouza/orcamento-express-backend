@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: orcamento-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orcamento_db
+
+  redis:
+    image: redis:alpine
+    container_name: orcamento-redis
+    ports:
+      - "6379:6379"
