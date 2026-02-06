@@ -1,6 +1,10 @@
 import { Entity } from "./entity.js";
 import { UniqueEntityId } from "./unique-entity-id.js";
-import { QuoteStatus, isValidStatusTransition } from "./enums/quote-status.js";
+import {
+  QuoteStatus,
+  isValidStatusTransition,
+  isEditableStatus,
+} from "./enums/quote-status.js";
 import { QuoteItem } from "./quote-item.js";
 import { calculateQuoteTotals } from "../../shared/utils/quote/calculate-totals.js";
 
@@ -75,7 +79,9 @@ export class Quote extends Entity<QuoteProps> {
   removeItem(itemId: UniqueEntityId | string): void {
     this.assertEditable();
     const targetId = typeof itemId === "string" ? itemId : itemId.toString();
-    this.props.items = this.props.items.filter((item) => item.id.toString() !== targetId);
+    this.props.items = this.props.items.filter(
+      (item) => item.id.toString() !== targetId,
+    );
     this.recalculateTotals();
     this.touch();
   }
@@ -118,8 +124,8 @@ export class Quote extends Entity<QuoteProps> {
   }
 
   private assertEditable(): void {
-    if (this.props.status !== QuoteStatus.DRAFT) {
-      throw new Error("Quote is immutable after SUBMITTED");
+    if (!isEditableStatus(this.props.status)) {
+      throw new Error("Quote is immutable after file generation starts");
     }
   }
 
