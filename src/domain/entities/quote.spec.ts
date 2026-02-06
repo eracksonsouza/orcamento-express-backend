@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
-import { Quote } from "./quote.js";
-import { QuoteItem } from "./quote-item.js";
-import { QuoteStatus } from "./enums/quote-status.js";
-import { QuoteItemType } from "./enums/quote-item-type.js";
-import { UniqueEntityId } from "./unique-entity-id.js";
+import { Quote } from "./quote";
+import { QuoteItem } from "./quote-item";
+import { QuoteStatus } from "./enums/quote-status";
+import { QuoteItemType } from "./enums/quote-item-type";
+import { UniqueEntityId } from "./unique-entity-id";
 
 const makeItem = (
   unitPrice: number,

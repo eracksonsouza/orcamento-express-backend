@@ -4,7 +4,7 @@ import {
   QUOTE_ITEM_TYPE_VALUES,
   QuoteItemType,
   isValidQuoteItemType,
-} from "./quote-item-type.js";
+} from "./quote-item-type";
 
 test("should list all quote item types", () => {
   expect(QUOTE_ITEM_TYPE_VALUES).toEqual([

@@ -3,7 +3,7 @@ import {
   QuoteStatus,
   isEditableStatus,
   isValidStatusTransition,
-} from "./quote-status.js";
+} from "./quote-status";
 
 test("should allow editing until files are ready", () => {
   expect(isEditableStatus(QuoteStatus.DRAFT)).toBe(true);

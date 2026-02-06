@@ -1,4 +1,4 @@
-import { DomainError } from "./domain-error.js";
+import { DomainError } from "./domain-error";
 
 export class EmptyQuoteError extends DomainError {
   constructor(options?: { cause?: unknown }) {

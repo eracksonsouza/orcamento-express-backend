@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Money } from "./money.js";
+import { Money } from "./money";
 
 test("should create money from decimal", () => {
   const money = Money.fromDecimal(199.9);

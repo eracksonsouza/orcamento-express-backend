@@ -1,9 +1,9 @@
-import { Entity } from "./entity.js";
-import { UniqueEntityId } from "./unique-entity-id.js";
+import { Entity } from "./entity";
+import { UniqueEntityId } from "./unique-entity-id";
 import {
   QuoteItemType,
   isValidQuoteItemType,
-} from "./enums/quote-item-type.js";
+} from "./enums/quote-item-type";
 
 export interface QuoteItemProps {
   unitPrice: number;

@@ -1,5 +1,5 @@
-import type { QuoteStatus } from "../entities/enums/quote-status.js";
-import { DomainError } from "./domain-error.js";
+import type { QuoteStatus } from "../entities/enums/quote-status";
+import { DomainError } from "./domain-error";
 
 export class InvalidStatusTransitionError extends DomainError {
   readonly from: QuoteStatus;

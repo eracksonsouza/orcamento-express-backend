@@ -1,5 +1,5 @@
-import { Entity } from "./entity.js";
-import { UniqueEntityId } from "./unique-entity-id.js";
+import { Entity } from "./entity";
+import { UniqueEntityId } from "./unique-entity-id";
 
 export interface CustomerProps {
   name: string;

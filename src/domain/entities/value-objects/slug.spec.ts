@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Slug } from "./slug.js";
+import { Slug } from "./slug";
 
 test("should create a valid slug", () => {
   const text = "Hello World! This is a Test.";

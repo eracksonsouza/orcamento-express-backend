@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Phone } from "./phone.js";
+import { Phone } from "./phone";
 
 test("should create a valid phone", () => {
   const validPhones = [

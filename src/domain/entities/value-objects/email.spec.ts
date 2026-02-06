@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Email } from "./email.js";
+import { Email } from "./email";
 
 test("should create a valid email", () => {
   // Teste de criação de email válido

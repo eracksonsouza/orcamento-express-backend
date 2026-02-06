@@ -1,12 +1,12 @@
-import { Entity } from "./entity.js";
-import { UniqueEntityId } from "./unique-entity-id.js";
+import { Entity } from "./entity";
+import { UniqueEntityId } from "./unique-entity-id";
 import {
   QuoteStatus,
   isValidStatusTransition,
   isEditableStatus,
-} from "./enums/quote-status.js";
-import { QuoteItem } from "./quote-item.js";
-import { calculateQuoteTotals } from "../../shared/utils/quote/calculate-totals.js";
+} from "./enums/quote-status";
+import { QuoteItem } from "./quote-item";
+import { calculateQuoteTotals } from "../../shared/utils/quote/calculate-totals";
 
 export interface QuoteProps {
   value: number;

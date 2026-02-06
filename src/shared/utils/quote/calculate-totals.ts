@@ -1,4 +1,4 @@
-import { QuoteItem } from "../../../domain/entities/quote-item.js";
+import { QuoteItem } from "../../../domain/entities/quote-item";
 
 export interface QuoteTotals {
   subtotal: number;
