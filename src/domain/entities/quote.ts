@@ -1,5 +1,5 @@
-import { Entity } from "./entity";
-import { UniqueEntityId } from "./unique-entity-id";
+import { Entity } from "./../../core/entities/entity";
+import { UniqueEntityId } from "../../core/entities/unique-entity-id";
 import {
   QuoteStatus,
   isValidStatusTransition,

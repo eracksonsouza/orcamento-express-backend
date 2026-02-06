@@ -3,7 +3,7 @@ import { Quote } from "./quote";
 import { QuoteItem } from "./quote-item";
 import { QuoteStatus } from "./enums/quote-status";
 import { QuoteItemType } from "./enums/quote-item-type";
-import { UniqueEntityId } from "./unique-entity-id";
+import { UniqueEntityId } from "../../core/entities/unique-entity-id";
 
 const makeItem = (
   unitPrice: number,

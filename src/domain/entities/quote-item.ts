@@ -1,11 +1,17 @@
-import { Entity } from "./entity";
-import { UniqueEntityId } from "./unique-entity-id";
-import {
-  QuoteItemType,
-  isValidQuoteItemType,
-} from "./enums/quote-item-type";
+import { Entity } from "../../core/entities/entity";
+import { UniqueEntityId } from "../../core/entities/unique-entity-id";
+import { QuoteItemType, isValidQuoteItemType } from "./enums/quote-item-type";
 
 export interface QuoteItemProps {
+  unitPrice: number;
+  quantity: number;
+  type: QuoteItemType;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateQuoteItemProps {
   unitPrice: number;
   quantity: number;
   type: QuoteItemType;
@@ -27,30 +33,23 @@ export class QuoteItem extends Entity<QuoteItemProps> {
     return this.props.type;
   }
 
-  get description(): string | null | undefined {
+  get description(): string | null {
     return this.props.description;
   }
 
   get createdAt(): Date {
-    return this.props.createdAt!;
+    return this.props.createdAt;
   }
 
   get updatedAt(): Date {
-    return this.props.updatedAt!;
+    return this.props.updatedAt;
   }
 
   calculateTotal(): number {
     return this.props.unitPrice * this.props.quantity;
   }
 
-  static create(
-    props: Partial<QuoteItemProps> & {
-      unitPrice: number;
-      quantity: number;
-      type: QuoteItemType;
-    },
-    id?: UniqueEntityId | string,
-  ): QuoteItem {
+  static create(props: CreateQuoteItemProps, id?: UniqueEntityId): QuoteItem {
     if (props.quantity <= 0) {
       throw new Error("Quantity must be greater than 0");
     }
@@ -63,7 +62,6 @@ export class QuoteItem extends Entity<QuoteItemProps> {
       throw new Error(`Invalid item type: ${props.type}`);
     }
 
-    const resolvedId = typeof id === "string" ? new UniqueEntityId(id) : id;
     return new QuoteItem(
       {
         unitPrice: props.unitPrice,
@@ -73,7 +71,7 @@ export class QuoteItem extends Entity<QuoteItemProps> {
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
-      resolvedId,
+      id,
     );
   }
 }

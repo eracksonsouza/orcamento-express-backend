@@ -1,7 +1,15 @@
-import { Entity } from "./entity";
-import { UniqueEntityId } from "./unique-entity-id";
+import { Entity } from "../../core/entities/entity";
+import { UniqueEntityId } from "../../core/entities/unique-entity-id";
 
 export interface CustomerProps {
+  name: string;
+  email: string | null | undefined;
+  phone: string | null | undefined;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateCustomerProps {
   name: string;
   email?: string | null;
   phone?: string | null;
@@ -23,11 +31,11 @@ export class Customer extends Entity<CustomerProps> {
   }
 
   get createdAt(): Date {
-    return this.props.createdAt!;
+    return this.props.createdAt;
   }
 
   get updatedAt(): Date {
-    return this.props.updatedAt!;
+    return this.props.updatedAt;
   }
 
   updateName(name: string): void {
@@ -49,10 +57,12 @@ export class Customer extends Entity<CustomerProps> {
     this.props.updatedAt = new Date();
   }
 
-  static create(props: CustomerProps, id?: UniqueEntityId): Customer {
+  static create(props: CreateCustomerProps, id?: UniqueEntityId): Customer {
     const customer = new Customer(
       {
-        ...props,
+        name: props.name,
+        email: props.email,
+        phone: props.phone,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },

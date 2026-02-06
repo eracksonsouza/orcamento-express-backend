@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { Customer } from "./entities/customer";
-import { UniqueEntityId } from "./entities/unique-entity-id";
+import { Customer } from "./customer";
+import { UniqueEntityId } from "../../core/entities/unique-entity-id";
 
 describe("Customer", () => {
   test("should be able to create a customer", () => {
