@@ -1,4 +1,3 @@
-import { describe, it, expect, test } from "vitest";
 import { Vehicle } from "./vehicle";
 import { VehicleType } from "./enums/vehicle-type";
 

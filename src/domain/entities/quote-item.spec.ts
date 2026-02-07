@@ -1,4 +1,3 @@
-import { expect, test } from "vitest";
 import { QuoteItem } from "./quote-item";
 import { QuoteItemType } from "./enums/quote-item-type";
 
