@@ -21,6 +21,7 @@ export interface QuoteProps {
 }
 
 export class Quote extends Entity<QuoteProps> {
+  customerId: string;
   get value(): number {
     return this.props.value;
   }

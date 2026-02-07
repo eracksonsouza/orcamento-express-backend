@@ -1,0 +1,12 @@
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: orcamento-db-test
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: orcamento_test
+    tmpfs:
+      - /var/lib/postgresql/data

@@ -3,11 +3,18 @@ import type {
   PaginationParams,
   PaginatedResult,
 } from "@/src/domain/repositories/customer-repository";
-import prisma from "../../database/prisma/client";
+import type { PrismaClient } from "@prisma/client";
+import prismaClient from "../../database/prisma/client";
 import { Customer } from "@/src/domain/entities/customer";
 import { PrismaCustomerMapper } from "./mappers/customer-mapper";
 
 export class PrismaCustomerRepository implements CustomerRepository {
+  private prisma: PrismaClient;
+
+  constructor(prisma?: PrismaClient) {
+    this.prisma = prisma ?? prismaClient;
+  }
+
   async save(customer: Customer): Promise<void> {
     const exists = await this.exists(customer.id.toString());
 
@@ -20,7 +27,7 @@ export class PrismaCustomerRepository implements CustomerRepository {
   }
 
   async exists(id: string): Promise<boolean> {
-    const customer = await prisma.customer.findUnique({
+    const customer = await this.prisma.customer.findUnique({
       where: { id },
       select: { id: true },
     });
@@ -28,17 +35,17 @@ export class PrismaCustomerRepository implements CustomerRepository {
   }
 
   async findById(id: string): Promise<Customer | null> {
-    const customer = await prisma.customer.findUnique({ where: { id } });
+    const customer = await this.prisma.customer.findUnique({ where: { id } });
     return customer ? PrismaCustomerMapper.toDomain(customer) : null;
   }
 
   async findByEmail(email: string): Promise<Customer | null> {
-    const customer = await prisma.customer.findFirst({ where: { email } });
+    const customer = await this.prisma.customer.findFirst({ where: { email } });
     return customer ? PrismaCustomerMapper.toDomain(customer) : null;
   }
 
   async findByPhone(phone: string): Promise<Customer | null> {
-    const customer = await prisma.customer.findFirst({ where: { phone } });
+    const customer = await this.prisma.customer.findFirst({ where: { phone } });
     return customer ? PrismaCustomerMapper.toDomain(customer) : null;
   }
 
@@ -46,13 +53,13 @@ export class PrismaCustomerRepository implements CustomerRepository {
     const page = params?.page || 1;
     const perPage = params?.perPage || 10;
 
-    const [data, total] = await prisma.$transaction([
-      prisma.customer.findMany({
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.customer.findMany({
         skip: (page - 1) * perPage,
         take: perPage,
         orderBy: { createdAt: "desc" },
       }),
-      prisma.customer.count(),
+      this.prisma.customer.count(),
     ]);
 
     return {
@@ -78,13 +85,13 @@ export class PrismaCustomerRepository implements CustomerRepository {
       ],
     };
 
-    const [data, total] = await prisma.$transaction([
-      prisma.customer.findMany({
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.customer.findMany({
         where,
         skip: (page - 1) * perPage,
         take: perPage,
       }),
-      prisma.customer.count({ where }),
+      this.prisma.customer.count({ where }),
     ]);
 
     return {
@@ -97,19 +104,19 @@ export class PrismaCustomerRepository implements CustomerRepository {
   }
 
   private async create(customer: Customer): Promise<void> {
-    await prisma.customer.create({
+    await this.prisma.customer.create({
       data: PrismaCustomerMapper.toPersistence(customer),
     });
   }
 
   private async update(customer: Customer): Promise<void> {
-    await prisma.customer.update({
+    await this.prisma.customer.update({
       where: { id: customer.id.toString() },
       data: PrismaCustomerMapper.toUpdatePersistence(customer),
     });
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.customer.delete({ where: { id } });
+    await this.prisma.customer.delete({ where: { id } });
   }
 }

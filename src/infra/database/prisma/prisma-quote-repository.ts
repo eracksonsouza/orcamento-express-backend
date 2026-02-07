@@ -6,7 +6,8 @@ import type {
   PaginationParams,
   PaginatedResult,
 } from "@/src/domain/repositories/customer-repository";
-import prisma from "../../database/prisma/client";
+import type { PrismaClient } from "@prisma/client";
+import prismaClient from "../../database/prisma/client";
 import { Quote } from "@/src/domain/entities/quote";
 import type { QuoteStatus } from "@/src/domain/entities/enums/quote-status";
 import { Prisma } from "@prisma/client";
@@ -15,6 +16,12 @@ import { PrismaQuoteMapper } from "./mappers/prisma-quote-mapper";
 const INCLUDE_ITEMS = { items: true } as const;
 
 export class PrismaQuoteRepository implements QuoteRepository {
+  private prisma: PrismaClient;
+
+  constructor(prisma?: PrismaClient) {
+    this.prisma = prisma ?? prismaClient;
+  }
+
   async save(quote: Quote, customerId?: string): Promise<void> {
     const exists = await this.exists(quote.id.toString());
 
@@ -29,7 +36,7 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   async exists(id: string): Promise<boolean> {
-    const quote = await prisma.quote.findUnique({
+    const quote = await this.prisma.quote.findUnique({
       where: { id },
       select: { id: true },
     });
@@ -37,7 +44,7 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   async findById(id: string): Promise<Quote | null> {
-    const quote = await prisma.quote.findUnique({
+    const quote = await this.prisma.quote.findUnique({
       where: { id },
       include: INCLUDE_ITEMS,
     });
@@ -45,7 +52,7 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   async findByCustomerId(customerId: string): Promise<Quote[]> {
-    const quotes = await prisma.quote.findMany({
+    const quotes = await this.prisma.quote.findMany({
       where: { customerId },
       include: INCLUDE_ITEMS,
       orderBy: { createdAt: "desc" },
@@ -54,7 +61,7 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   async findByStatus(status: QuoteStatus): Promise<Quote[]> {
-    const quotes = await prisma.quote.findMany({
+    const quotes = await this.prisma.quote.findMany({
       where: { status },
       include: INCLUDE_ITEMS,
       orderBy: { createdAt: "desc" },
@@ -70,15 +77,15 @@ export class PrismaQuoteRepository implements QuoteRepository {
     const perPage = params?.perPage || 10;
     const where = this.buildWhereClause(filters);
 
-    const [data, total] = await prisma.$transaction([
-      prisma.quote.findMany({
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.quote.findMany({
         where,
         include: INCLUDE_ITEMS,
         skip: (page - 1) * perPage,
         take: perPage,
         orderBy: { createdAt: "desc" },
       }),
-      prisma.quote.count({ where }),
+      this.prisma.quote.count({ where }),
     ]);
 
     return {
@@ -91,7 +98,7 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   async findVersions(parentId: string): Promise<Quote[]> {
-    const quotes = await prisma.quote.findMany({
+    const quotes = await this.prisma.quote.findMany({
       where: { parentId },
       include: INCLUDE_ITEMS,
       orderBy: { version: "asc" },
@@ -100,7 +107,7 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.quote.delete({ where: { id } });
+    await this.prisma.quote.delete({ where: { id } });
   }
 
   private buildWhereClause(filters?: QuoteFilters): Prisma.QuoteWhereInput {
@@ -119,13 +126,13 @@ export class PrismaQuoteRepository implements QuoteRepository {
   }
 
   private async create(quote: Quote, customerId: string): Promise<void> {
-    await prisma.quote.create({
+    await this.prisma.quote.create({
       data: PrismaQuoteMapper.toPersistence(quote, customerId),
     });
   }
 
   private async update(quote: Quote): Promise<void> {
-    await prisma.quote.update({
+    await this.prisma.quote.update({
       where: { id: quote.id.toString() },
       data: PrismaQuoteMapper.toUpdatePersistence(quote),
     });
