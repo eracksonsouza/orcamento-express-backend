@@ -108,3 +108,8 @@ model Vehicle {
 
   @@map("vehicles")
 }
+
+enum QuoteItemType {
+  PART
+  SERVICE
+}
