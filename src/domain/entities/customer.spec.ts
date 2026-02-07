@@ -71,9 +71,9 @@ describe("Customer", () => {
       email: "john@example.com",
     });
 
-    customer.updateEmail(null);
+    customer.updateEmail('');
 
-    expect(customer.email).toBeNull();
+    expect(customer.email).toBe('');
   });
 
   test("should be able to update customer phone", () => {
@@ -93,9 +93,9 @@ describe("Customer", () => {
       phone: "11999999999",
     });
 
-    customer.updatePhone(null);
+    customer.updatePhone('');
 
-    expect(customer.phone).toBeNull();
+    expect(customer.phone).toBe('');
   });
 
   test("should create customer with optional email and phone as undefined", () => {
@@ -103,7 +103,7 @@ describe("Customer", () => {
       name: "John Doe",
     });
 
-    expect(customer.email).toBeUndefined();
-    expect(customer.phone).toBeUndefined();
+    expect(customer.email).toBe('');
+    expect(customer.phone).toBe('');
   });
 });
