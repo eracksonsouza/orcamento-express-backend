@@ -1,6 +1,9 @@
-import type { Quote } from "../entities/quote";
-import type { QuoteStatus } from "../entities/enums/quote-status";
-import type { PaginationParams, PaginatedResult } from "./customer-repository";
+import type { Quote } from "@/src/domain/quote/enterprise/entities/quote";
+import type { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
+import type {
+  PaginationParams,
+  PaginatedResult,
+} from "@/src/domain/customer/application/repositories/customer-repository";
 
 export interface QuoteFilters {
   customerId?: string;

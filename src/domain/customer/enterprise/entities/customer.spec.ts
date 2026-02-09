@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { Customer } from "./customer";
-import { UniqueEntityId } from "../../core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 
 describe("Customer", () => {
   test("should be able to create a customer", () => {
@@ -71,9 +71,9 @@ describe("Customer", () => {
       email: "john@example.com",
     });
 
-    customer.updateEmail('');
+    customer.updateEmail("");
 
-    expect(customer.email).toBe('');
+    expect(customer.email).toBe("");
   });
 
   test("should be able to update customer phone", () => {
@@ -93,9 +93,9 @@ describe("Customer", () => {
       phone: "11999999999",
     });
 
-    customer.updatePhone('');
+    customer.updatePhone("");
 
-    expect(customer.phone).toBe('');
+    expect(customer.phone).toBe("");
   });
 
   test("should create customer with optional email and phone as undefined", () => {
@@ -103,7 +103,7 @@ describe("Customer", () => {
       name: "John Doe",
     });
 
-    expect(customer.email).toBe('');
-    expect(customer.phone).toBe('');
+    expect(customer.email).toBe("");
+    expect(customer.phone).toBe("");
   });
 });

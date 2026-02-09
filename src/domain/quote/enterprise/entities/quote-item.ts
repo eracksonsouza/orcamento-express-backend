@@ -1,6 +1,6 @@
-import { Entity } from "../../core/entities/entity";
-import { UniqueEntityId } from "../../core/entities/unique-entity-id";
-import { QuoteItemType, isValidQuoteItemType } from "./enums/quote-item-type";
+import { Entity } from "@/src/core/entities/entity";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
+import { QuoteItemType, isValidQuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
 
 export interface QuoteItemProps {
   unitPrice: number;

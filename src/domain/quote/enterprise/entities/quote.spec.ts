@@ -1,8 +1,8 @@
 import { Quote } from "./quote";
 import { QuoteItem } from "./quote-item";
-import { QuoteStatus } from "./enums/quote-status";
-import { QuoteItemType } from "./enums/quote-item-type";
-import { UniqueEntityId } from "../../core/entities/unique-entity-id";
+import { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
+import { QuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 
 const makeItem = (
   unitPrice: number,
@@ -11,7 +11,7 @@ const makeItem = (
 ): QuoteItem => {
   return QuoteItem.create(
     { unitPrice, quantity, type: QuoteItemType.PART },
-    id,
+    id ? new UniqueEntityId(id) : undefined,
   );
 };
 
