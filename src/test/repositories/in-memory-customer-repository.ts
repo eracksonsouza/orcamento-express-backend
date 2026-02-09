@@ -1,9 +1,9 @@
-import { Customer } from "@/src/domain/entities/customer";
+import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
 import type {
   PaginationParams,
   PaginatedResult,
   CustomerRepository,
-} from "@/src/domain/repositories/customer-repository";
+} from "@/src/domain/customer/application/repositories/customer-repository";
 
 export class InMemoryCustomerRepository implements CustomerRepository {
   public customers: Customer[] = [];

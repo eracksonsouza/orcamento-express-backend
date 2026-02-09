@@ -1,4 +1,4 @@
-import { Customer } from "@/src/domain/entities/customer";
+import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import type { Customer as PrismaCustomer, Prisma } from "@prisma/client";
 

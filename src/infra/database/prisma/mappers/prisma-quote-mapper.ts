@@ -1,6 +1,6 @@
-import { Quote } from "@/src/domain/entities/quote";
+import { Quote } from "@/src/domain/quote/enterprise/entities/quote";
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
-import type { QuoteStatus } from "@/src/domain/entities/enums/quote-status";
+import type { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
 import type {
   Prisma,
   Quote as PrismaQuote,

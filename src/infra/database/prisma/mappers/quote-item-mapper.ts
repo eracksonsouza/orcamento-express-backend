@@ -1,7 +1,7 @@
-import { QuoteItem } from "@/src/domain/entities/quote-item";
+import { QuoteItem } from "@/src/domain/quote/enterprise/entities/quote-item";
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import type { QuoteItem as PrismaQuoteItem, Prisma } from "@prisma/client";
-import { QuoteItemType } from "@/src/domain/entities/enums/quote-item-type";
+import { QuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
 
 export class PrismaQuoteItemMapper {
   /**

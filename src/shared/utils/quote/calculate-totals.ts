@@ -1,4 +1,4 @@
-import { QuoteItem } from "../../../domain/entities/quote-item";
+import { QuoteItem } from "@/src/domain/quote/enterprise/entities/quote-item";
 
 export interface QuoteTotals {
   subtotal: number;
