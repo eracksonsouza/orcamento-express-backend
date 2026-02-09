@@ -1,6 +1,5 @@
-import { describe, it, expect, test } from "vitest";
 import { Vehicle } from "./vehicle";
-import { VehicleType } from "./enums/vehicle-type";
+import { VehicleType } from "@/src/domain/vehicle/enterprise/enums/vehicle-type";
 
 describe("Vehicle", () => {
   const validProps = {

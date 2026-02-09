@@ -1,4 +1,4 @@
-import { DomainError } from "./domain-error";
+import { DomainError } from "@/src/shared/utils/errors/domain-error";
 
 export class CustomerNotFoundError extends DomainError {
   constructor(options?: { cause?: unknown }) {

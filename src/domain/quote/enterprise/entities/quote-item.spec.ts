@@ -1,6 +1,5 @@
-import { expect, test } from "vitest";
 import { QuoteItem } from "./quote-item";
-import { QuoteItemType } from "./enums/quote-item-type";
+import { QuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
 
 test("should validate quantity > 0", () => {
   const invalidQuantities = [0, -1, -10];

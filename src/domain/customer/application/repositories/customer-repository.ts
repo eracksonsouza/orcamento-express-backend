@@ -1,4 +1,4 @@
-import type { Customer } from "../entities/customer";
+import type { Customer } from "@/src/domain/customer/enterprise/entities/customer";
 
 export interface PaginationParams {
   page: number;

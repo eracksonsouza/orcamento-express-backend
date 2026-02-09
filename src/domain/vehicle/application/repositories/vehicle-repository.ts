@@ -1,5 +1,8 @@
-import type { Vehicle } from "../entities/vehicle";
-import type { PaginationParams, PaginatedResult } from "./customer-repository";
+import type { Vehicle } from "@/src/domain/vehicle/enterprise/entities/vehicle";
+import type {
+  PaginationParams,
+  PaginatedResult,
+} from "@/src/domain/customer/application/repositories/customer-repository";
 
 export interface VehicleRepository {
   findById(id: string): Promise<Vehicle | null>;

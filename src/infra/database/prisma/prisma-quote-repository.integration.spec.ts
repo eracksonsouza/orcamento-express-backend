@@ -1,11 +1,11 @@
 import { describe, expect, test, beforeEach } from "vitest";
 import { PrismaQuoteRepository } from "./prisma-quote-repository";
 import { PrismaCustomerRepository } from "./prisma-customer-repository";
-import { Quote } from "@/src/domain/entities/quote";
-import { QuoteItem } from "@/src/domain/entities/quote-item";
-import { Customer } from "@/src/domain/entities/customer";
-import { QuoteStatus } from "@/src/domain/entities/enums/quote-status";
-import { QuoteItemType } from "@/src/domain/entities/enums/quote-item-type";
+import { Quote } from "@/src/domain/quote/enterprise/entities/quote";
+import { QuoteItem } from "@/src/domain/quote/enterprise/entities/quote-item";
+import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
+import { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
+import { QuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { prismaTest } from "@/src/test/setup/prisma-test-client";
 

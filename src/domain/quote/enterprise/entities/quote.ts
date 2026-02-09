@@ -1,16 +1,17 @@
-import { Entity } from "./../../core/entities/entity";
-import { UniqueEntityId } from "../../core/entities/unique-entity-id";
+import { Entity } from "@/src/core/entities/entity";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import {
   QuoteStatus,
   isValidStatusTransition,
   isEditableStatus,
-} from "./enums/quote-status";
+} from "@/src/domain/quote/enterprise/enums/quote-status";
 import { QuoteItem } from "./quote-item";
-import { calculateQuoteTotals } from "../../shared/utils/quote/calculate-totals";
+import { calculateQuoteTotals } from "@/src/shared/utils/quote/calculate-totals";
 
 export interface QuoteProps {
   value: number;
   description?: string | null;
+  customerId: string;
   status: QuoteStatus;
   version: number;
   items: QuoteItem[];
@@ -21,7 +22,9 @@ export interface QuoteProps {
 }
 
 export class Quote extends Entity<QuoteProps> {
-  customerId: string;
+  get customerId(): string {
+    return this.props.customerId;
+  }
   get value(): number {
     return this.props.value;
   }
@@ -141,6 +144,7 @@ export class Quote extends Entity<QuoteProps> {
     const resolvedId = typeof id === "string" ? new UniqueEntityId(id) : id;
     const quote = new Quote(
       {
+        customerId: props.customerId!,
         value: props.value ?? 0,
         description: props.description ?? null,
         status: props.status ?? QuoteStatus.DRAFT,

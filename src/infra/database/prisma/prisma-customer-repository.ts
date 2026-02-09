@@ -2,10 +2,10 @@ import type {
   CustomerRepository,
   PaginationParams,
   PaginatedResult,
-} from "@/src/domain/repositories/customer-repository";
+} from "@/src/domain/customer/application/repositories/customer-repository";
 import type { PrismaClient } from "@prisma/client";
-import prismaClient from "../../database/prisma/client";
-import { Customer } from "@/src/domain/entities/customer";
+import prismaClient from "@/src/infra/database/prisma/client";
+import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
 import { PrismaCustomerMapper } from "./mappers/customer-mapper";
 
 export class PrismaCustomerRepository implements CustomerRepository {

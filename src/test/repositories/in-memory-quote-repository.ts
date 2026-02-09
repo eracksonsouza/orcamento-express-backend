@@ -1,13 +1,13 @@
-import { Quote } from "@/src/domain/entities/quote";
-import type { QuoteStatus } from "@/src/domain/entities/enums/quote-status";
+import { Quote } from "@/src/domain/quote/enterprise/entities/quote";
+import type { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
 import type {
   PaginationParams,
   PaginatedResult,
-} from "@/src/domain/repositories/customer-repository";
+} from "@/src/domain/customer/application/repositories/customer-repository";
 import type {
   QuoteRepository,
   QuoteFilters,
-} from "@/src/domain/repositories/quote-repository";
+} from "@/src/domain/quote/application/repositories/quote-repository";
 
 export class InMemoryQuoteRepository implements QuoteRepository {
   public quotes: Quote[] = [];

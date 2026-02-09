@@ -1,10 +1,10 @@
-import { Entity } from "../../core/entities/entity";
-import { UniqueEntityId } from "../../core/entities/unique-entity-id";
+import { Entity } from "@/src/core/entities/entity";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 
 export interface CustomerProps {
   name: string;
-  email: string ;
-  phone: string 
+  email: string;
+  phone: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -12,7 +12,7 @@ export interface CustomerProps {
 export interface CreateCustomerProps {
   name: string;
   email?: string;
-  phone?: string ;
+  phone?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -43,12 +43,12 @@ export class Customer extends Entity<CustomerProps> {
     this.touch();
   }
 
-  updateEmail(email: string ): void {
+  updateEmail(email: string): void {
     this.props.email = email;
     this.touch();
   }
 
-  updatePhone(phone: string ): void {
+  updatePhone(phone: string): void {
     this.props.phone = phone;
     this.touch();
   }
@@ -61,16 +61,15 @@ export class Customer extends Entity<CustomerProps> {
     const customer = new Customer(
       {
         name: props.name,
-        email: props.email ?? '',  // Default to empty string
-        phone: props.phone ?? '',  // Default to empty string
+        email: props.email ?? "", // Default to empty string
+        phone: props.phone ?? "", // Default to empty string
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
       id,
     );
-  
+
     return customer;
   }
   // ...existing code...
-
 }

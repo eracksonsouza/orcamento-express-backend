@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from "vitest";
 import { PrismaCustomerRepository } from "./prisma-customer-repository";
-import { Customer } from "@/src/domain/entities/customer";
+import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { prismaTest } from "@/src/test/setup/prisma-test-client";
 
