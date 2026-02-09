@@ -1,99 +1,57 @@
-import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
 import type {
+  CustomerRepository,
   PaginationParams,
   PaginatedResult,
-  CustomerRepository,
 } from "@/src/domain/customer/application/repositories/customer-repository";
+import type { Customer } from "@/src/domain/customer/enterprise/entities/customer";
+import { paginate } from "./helpers/paginate";
+import { searchCustomers } from "./helpers/search-customers";
 
 export class InMemoryCustomerRepository implements CustomerRepository {
-  public customers: Customer[] = [];
+  public items: Customer[] = [];
 
   async save(customer: Customer): Promise<void> {
-    const index = this.customers.findIndex(
-      (c) => c.id.toString() === customer.id.toString(),
+    const index = this.items.findIndex(
+      (item) => item.id.toString() === customer.id.toString(),
     );
-    if (index >= 0) {
-      this.customers[index] = customer;
-    } else {
-      this.customers.push(customer);
-    }
-  }
 
-  async exists(id: string): Promise<boolean> {
-    return this.customers.some((c) => c.id.toString() === id);
+    if (index >= 0) {
+      this.items[index] = customer;
+      return;
+    }
+
+    this.items.push(customer);
   }
 
   async findById(id: string): Promise<Customer | null> {
-    const customer = this.customers.find((c) => c.id.toString() === id);
-    return customer ?? null;
+    return this.items.find((customer) => customer.id.toString() === id) ?? null;
   }
 
   async findByEmail(email: string): Promise<Customer | null> {
-    const customer = this.customers.find((c) => c.email === email);
-    return customer ?? null;
+    return this.items.find((customer) => customer.email === email) ?? null;
   }
 
   async findByPhone(phone: string): Promise<Customer | null> {
-    const customer = this.customers.find((c) => c.phone === phone);
-    return customer ?? null;
+    return this.items.find((customer) => customer.phone === phone) ?? null;
   }
 
   async findAll(params?: PaginationParams): Promise<PaginatedResult<Customer>> {
-    const page = params?.page ?? 1;
-    const perPage = params?.perPage ?? 10;
-    const start = (page - 1) * perPage;
-    const end = start + perPage;
-
-    const data = this.customers.slice(start, end);
-    const total = this.customers.length;
-
-    return {
-      data,
-      total,
-      page,
-      perPage,
-      totalPages: Math.ceil(total / perPage),
-    };
+    return paginate({ items: this.items, ...(params && { params }) });
   }
 
   async search(
     query: string,
     params?: PaginationParams,
   ): Promise<PaginatedResult<Customer>> {
-    const page = params?.page ?? 1;
-    const perPage = params?.perPage ?? 10;
-    const lowerQuery = query.toLowerCase();
-
-    const filtered = this.customers.filter(
-      (c) =>
-        c.name.toLowerCase().includes(lowerQuery) ||
-        c.email?.toLowerCase().includes(lowerQuery) ||
-        c.phone?.toLowerCase().includes(lowerQuery),
-    );
-
-    const start = (page - 1) * perPage;
-    const end = start + perPage;
-    const data = filtered.slice(start, end);
-    const total = filtered.length;
-
-    return {
-      data,
-      total,
-      page,
-      perPage,
-      totalPages: Math.ceil(total / perPage),
-    };
+    const filteredItems = searchCustomers(this.items, query);
+    return paginate({ items: filteredItems, ...(params && { params }) });
   }
 
   async delete(id: string): Promise<void> {
-    const index = this.customers.findIndex((c) => c.id.toString() === id);
-    if (index >= 0) {
-      this.customers.splice(index, 1);
-    }
+    this.items = this.items.filter((customer) => customer.id.toString() !== id);
   }
 
-  // Helper methods for testing
-  clear(): void {
-    this.customers = [];
+  async exists(id: string): Promise<boolean> {
+    return this.items.some((customer) => customer.id.toString() === id);
   }
 }
