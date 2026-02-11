@@ -106,6 +106,46 @@ export class PrismaQuoteRepository implements QuoteRepository {
     return PrismaQuoteMapper.toDomainList(quotes);
   }
 
+  async search(
+    query: string,
+    params?: PaginationParams,
+    filters?: QuoteFilters,
+  ): Promise<PaginatedResult<Quote>> {
+    const page = params?.page || 1;
+    const perPage = params?.perPage || 10;
+    const normalizedQuery = query.trim();
+    const where = this.buildWhereClause(filters);
+
+    const searchWhere: Prisma.QuoteWhereInput = {
+      ...where,
+      OR: [
+        { id: { contains: normalizedQuery, mode: "insensitive" } },
+        { customerId: { contains: normalizedQuery, mode: "insensitive" } },
+        { status: { contains: normalizedQuery, mode: "insensitive" } },
+        { description: { contains: normalizedQuery, mode: "insensitive" } },
+      ],
+    };
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.quote.findMany({
+        where: searchWhere,
+        include: INCLUDE_ITEMS,
+        skip: (page - 1) * perPage,
+        take: perPage,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.quote.count({ where: searchWhere }),
+    ]);
+
+    return {
+      data: PrismaQuoteMapper.toDomainList(data),
+      total,
+      page,
+      perPage,
+      totalPages: Math.ceil(total / perPage),
+    };
+  }
+
   async delete(id: string): Promise<void> {
     await this.prisma.quote.delete({ where: { id } });
   }

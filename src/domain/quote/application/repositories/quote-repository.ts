@@ -21,7 +21,13 @@ export interface QuoteRepository {
     filters?: QuoteFilters,
   ): Promise<PaginatedResult<Quote>>;
   findVersions(parentId: string): Promise<Quote[]>;
+  search(
+    query: string,
+    params?: PaginationParams,
+    filters?: QuoteFilters,
+  ): Promise<PaginatedResult<Quote>>;
   save(quote: Quote): Promise<void>;
+
   delete(id: string): Promise<void>;
   exists(id: string): Promise<boolean>;
 }
