@@ -11,9 +11,6 @@ import type {
 import { paginate } from "./helpers/paginate";
 
 export class InMemoryQuoteRepository implements QuoteRepository {
-  existsById(): unknown {
-    throw new Error("Method not implemented.");
-  }
   public items: Quote[] = [];
 
   async save(quote: Quote): Promise<void> {
@@ -55,7 +52,7 @@ export class InMemoryQuoteRepository implements QuoteRepository {
     params?: PaginationParams,
     filters?: QuoteFilters,
   ): Promise<PaginatedResult<Quote>> {
-    const normalizedQuery = query.toLowerCase();
+    const normalizedQuery = query.trim().toLowerCase();
     const filteredItems = this.applyFilters(this.items, filters).filter(
       (quote) =>
         quote.id.toString().toLowerCase().includes(normalizedQuery) ||

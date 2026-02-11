@@ -14,11 +14,14 @@ describe("List quotes", () => {
     listQuotes = new ListQuotesUseCase(inMemoryQuoteRepository);
   });
 
-  async function createQuoteFixture(customerId: string): Promise<void> {
+  async function createQuoteFixture(
+    customerId: string,
+    status: QuoteStatus = QuoteStatus.DRAFT,
+  ): Promise<void> {
     await createQuote.execute({
       customerId,
       value: 0,
-      status: QuoteStatus.DRAFT,
+      status,
       version: 1,
       items: [],
       subtotal: 0,
@@ -105,5 +108,16 @@ describe("List quotes", () => {
     expect(result.page).toBe(1);
     expect(result.perPage).toBe(10);
     expect(result.totalPages).toBe(1);
+  });
+
+  test("should filter quotes by status", async () => {
+    await createQuoteFixture("customer-draft", QuoteStatus.DRAFT);
+    await createQuoteFixture("customer-submitted", QuoteStatus.SUBMITTED);
+
+    const result = await listQuotes.execute({ status: QuoteStatus.SUBMITTED });
+
+    expect(result.quotes).toHaveLength(1);
+    expect(result.total).toBe(1);
+    expect(result.quotes[0]?.status).toBe(QuoteStatus.SUBMITTED);
   });
 });

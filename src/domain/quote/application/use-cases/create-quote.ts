@@ -1,4 +1,3 @@
-import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import type { QuoteRepository } from "../repositories/quote-repository";
 import { Quote } from "../../enterprise/entities/quote";
 import { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
@@ -23,6 +22,7 @@ export class CreateQuoteUseCase {
   constructor(private quoteRepository: QuoteRepository) {}
 
   async execute({
+    quoteId,
     customerId,
     value,
     status,
@@ -43,7 +43,7 @@ export class CreateQuoteUseCase {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      new UniqueEntityId(customerId),
+      quoteId,
     );
 
     await this.quoteRepository.save(quote);

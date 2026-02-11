@@ -1,7 +1,10 @@
 import type { Quote } from "../../enterprise/entities/quote";
-import type { QuoteRepository } from "../repositories/quote-repository";
+import type {
+  QuoteFilters,
+  QuoteRepository,
+} from "../repositories/quote-repository";
 
-interface ListQuotesRequest {
+interface ListQuotesRequest extends QuoteFilters {
   page?: number;
   perPage?: number;
   query?: string;
@@ -17,14 +20,20 @@ interface ListQuotesResponse {
 
 export class ListQuotesUseCase {
   constructor(private quoteRepository: QuoteRepository) {}
-  async execute({
-    page = 1,
-    perPage = 10,
-    query,
-  }: ListQuotesRequest = {}): Promise<ListQuotesResponse> {
+  async execute(request: ListQuotesRequest = {}): Promise<ListQuotesResponse> {
+    const { page = 1, perPage = 10, query, ...filters } = request;
+    const hasFilters = Object.keys(filters).length > 0;
+
     const result = query
-      ? await this.quoteRepository.search(query, { page, perPage })
-      : await this.quoteRepository.findAll({ page, perPage });
+      ? await this.quoteRepository.search(
+          query,
+          { page, perPage },
+          hasFilters ? filters : undefined,
+        )
+      : await this.quoteRepository.findAll(
+          { page, perPage },
+          hasFilters ? filters : undefined,
+        );
 
     return {
       quotes: result.data,

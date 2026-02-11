@@ -10,13 +10,9 @@ export interface QuoteFilters {
   status?: QuoteStatus;
   startDate?: Date;
   endDate?: Date;
-  query?: string;
-  page?: number;
-  perPage?: number;
 }
 
 export interface QuoteRepository {
-  existsById(): unknown;
   findById(id: string): Promise<Quote | null>;
   findByCustomerId(customerId: string): Promise<Quote[]>;
   findByStatus(status: QuoteStatus): Promise<Quote[]>;
