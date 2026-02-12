@@ -5,6 +5,8 @@ import {
   isValidStatusTransition,
   isEditableStatus,
 } from "@/src/domain/quote/enterprise/enums/quote-status";
+import type { QuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
+import { InvalidQuoteItemError } from "@/src/domain/quote/enterprise/errors/invalid-quote-item-error";
 import { QuoteItem } from "./quote-item";
 import { calculateQuoteTotals } from "@/src/shared/utils/quote/calculate-totals";
 
@@ -19,6 +21,13 @@ export interface QuoteProps {
   total: number;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+interface UpdateQuoteItemProps {
+  unitPrice: number;
+  quantity: number;
+  type: QuoteItemType;
+  description?: string | null;
 }
 
 export class Quote extends Entity<QuoteProps> {
@@ -86,6 +95,37 @@ export class Quote extends Entity<QuoteProps> {
     this.props.items = this.props.items.filter(
       (item) => item.id.toString() !== targetId,
     );
+    this.recalculateTotals();
+    this.touch();
+  }
+
+  updateItem(
+    itemId: UniqueEntityId | string,
+    { unitPrice, quantity, type, description }: UpdateQuoteItemProps,
+  ): void {
+    this.assertEditable();
+    const targetId = typeof itemId === "string" ? itemId : itemId.toString();
+    const itemIndex = this.props.items.findIndex(
+      (item) => item.id.toString() === targetId,
+    );
+
+    if (itemIndex < 0) {
+      throw new InvalidQuoteItemError("Quote item not found");
+    }
+
+    const currentItem = this.props.items[itemIndex]!;
+    this.props.items[itemIndex] = QuoteItem.create(
+      {
+        unitPrice,
+        quantity,
+        type,
+        description: description ?? currentItem.description,
+        createdAt: currentItem.createdAt,
+        updatedAt: new Date(),
+      },
+      currentItem.id,
+    );
+
     this.recalculateTotals();
     this.touch();
   }

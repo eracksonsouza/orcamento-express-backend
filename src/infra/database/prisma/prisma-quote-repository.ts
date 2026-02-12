@@ -7,6 +7,7 @@ import type {
   PaginatedResult,
 } from "@/src/domain/customer/application/repositories/customer-repository";
 import type { PrismaClient } from "@prisma/client";
+import { QuoteStatus as PrismaQuoteStatus } from "@prisma/client";
 import prismaClient from "@/src/infra/database/prisma/client";
 import { Quote } from "@/src/domain/quote/enterprise/entities/quote";
 import type { QuoteStatus } from "@/src/domain/quote/enterprise/enums/quote-status";
@@ -115,14 +116,26 @@ export class PrismaQuoteRepository implements QuoteRepository {
     const perPage = params?.perPage || 10;
     const normalizedQuery = query.trim();
     const where = this.buildWhereClause(filters);
+    const statusQuery = normalizedQuery.toUpperCase() as PrismaQuoteStatus;
+    const isValidStatus = Object.values(PrismaQuoteStatus).includes(
+      statusQuery,
+    );
 
     const searchWhere: Prisma.QuoteWhereInput = {
       ...where,
       OR: [
         { id: { contains: normalizedQuery, mode: "insensitive" } },
         { customerId: { contains: normalizedQuery, mode: "insensitive" } },
-        { status: { contains: normalizedQuery, mode: "insensitive" } },
-        { description: { contains: normalizedQuery, mode: "insensitive" } },
+        ...(isValidStatus
+          ? [{ status: { equals: statusQuery } }]
+          : []),
+        {
+          items: {
+            some: {
+              description: { contains: normalizedQuery, mode: "insensitive" },
+            },
+          },
+        },
       ],
     };
 
@@ -171,10 +184,12 @@ export class PrismaQuoteRepository implements QuoteRepository {
     });
   }
 
-  private async update(quote: Quote): Promise<void> {
+  async update(quote: Quote): Promise<void> {
     await this.prisma.quote.update({
       where: { id: quote.id.toString() },
       data: PrismaQuoteMapper.toUpdatePersistence(quote),
     });
   }
+
+
 }
