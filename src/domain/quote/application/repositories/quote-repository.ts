@@ -27,7 +27,7 @@ export interface QuoteRepository {
     filters?: QuoteFilters,
   ): Promise<PaginatedResult<Quote>>;
   save(quote: Quote): Promise<void>;
-
+  update(quote: Quote): Promise<void>;
   delete(id: string): Promise<void>;
   exists(id: string): Promise<boolean>;
 }
