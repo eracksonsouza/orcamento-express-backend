@@ -26,6 +26,18 @@ export class InMemoryQuoteRepository implements QuoteRepository {
     this.items.push(quote);
   }
 
+  async update(quote: Quote): Promise<void> {
+    const index = this.items.findIndex(
+      (item) => item.id.toString() === quote.id.toString(),
+    );
+
+    if (index < 0) {
+      throw new Error("Quote not found");
+    }
+
+    this.items[index] = quote;
+  }
+
   async findById(id: string): Promise<Quote | null> {
     return this.items.find((quote) => quote.id.toString() === id) ?? null;
   }
