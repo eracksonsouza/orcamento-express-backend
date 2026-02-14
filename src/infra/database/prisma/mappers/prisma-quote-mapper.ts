@@ -17,6 +17,7 @@ export class PrismaQuoteMapper {
   static toDomain(raw: PrismaQuoteWithItems): Quote {
     return Quote.create(
       {
+        customerId: raw.customerId,
         value: Number(raw.total),
         status: raw.status as QuoteStatus,
         version: raw.version,
@@ -35,11 +36,10 @@ export class PrismaQuoteMapper {
    */
   static toPersistence(
     quote: Quote,
-    customerId: string,
   ): Prisma.QuoteCreateInput {
     return {
       id: quote.id.toString(),
-      customer: { connect: { id: customerId } },
+      customer: { connect: { id: quote.customerId } },
       version: quote.version,
       status: quote.status,
       subtotal: quote.subtotal,
