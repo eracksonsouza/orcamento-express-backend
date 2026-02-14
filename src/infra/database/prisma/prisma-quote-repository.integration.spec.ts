@@ -34,6 +34,19 @@ describe("PrismaQuoteRepository", () => {
   let quoteRepository: PrismaQuoteRepository;
   let customerRepository: PrismaCustomerRepository;
   let testCustomer: Customer;
+  const makeQuote = (
+    props: Parameters<typeof Quote.create>[0] = {},
+    customerId = testCustomer.id.toString(),
+    quoteId?: UniqueEntityId,
+  ): Quote => {
+    return Quote.create(
+      {
+        customerId,
+        ...props,
+      },
+      quoteId,
+    );
+  };
 
   beforeEach(async () => {
     quoteRepository = new PrismaQuoteRepository(prismaTest);
@@ -46,11 +59,11 @@ describe("PrismaQuoteRepository", () => {
 
   describe("save", () => {
     test("should create a new quote with items", async () => {
-      const quote = Quote.create({
+      const quote = makeQuote({
         items: [makeItem(100, 2), makeItem(50, 3)],
       });
 
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
       expect(found).not.toBeNull();
@@ -59,9 +72,9 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should create a quote without items", async () => {
-      const quote = Quote.create({});
+      const quote = makeQuote({});
 
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
       expect(found).not.toBeNull();
@@ -70,10 +83,10 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should update an existing quote", async () => {
-      const quote = Quote.create({
+      const quote = makeQuote({
         items: [makeItem(100, 1)],
       });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       // Add a new item
       quote.addItem(makeItem(200, 2));
@@ -84,19 +97,17 @@ describe("PrismaQuoteRepository", () => {
       expect(found?.total).toBe(500); // 100 + (200*2)
     });
 
-    test("should throw when creating without customerId", async () => {
-      const quote = Quote.create({});
+    test("should throw when creating with non-existent customer", async () => {
+      const quote = makeQuote({}, "non-existent-customer-id");
 
-      await expect(quoteRepository.save(quote)).rejects.toThrow(
-        "customerId is required when creating a new quote",
-      );
+      await expect(quoteRepository.save(quote)).rejects.toThrow();
     });
   });
 
   describe("exists", () => {
     test("should return true when quote exists", async () => {
-      const quote = Quote.create({});
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({});
+      await quoteRepository.save(quote);
 
       const exists = await quoteRepository.exists(quote.id.toString());
       expect(exists).toBe(true);
@@ -110,11 +121,11 @@ describe("PrismaQuoteRepository", () => {
 
   describe("findById", () => {
     test("should return quote with items when found", async () => {
-      const quote = Quote.create({
+      const quote = makeQuote({
         items: [makeItem(100, 1, "Oil Filter"), makeItem(50, 2, "Spark Plug")],
         status: QuoteStatus.DRAFT,
       });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
 
@@ -132,10 +143,10 @@ describe("PrismaQuoteRepository", () => {
 
   describe("findByCustomerId", () => {
     test("should return all quotes for a customer", async () => {
-      const quote1 = Quote.create({});
-      const quote2 = Quote.create({});
-      await quoteRepository.save(quote1, testCustomer.id.toString());
-      await quoteRepository.save(quote2, testCustomer.id.toString());
+      const quote1 = makeQuote({});
+      const quote2 = makeQuote({});
+      await quoteRepository.save(quote1);
+      await quoteRepository.save(quote2);
 
       const quotes = await quoteRepository.findByCustomerId(
         testCustomer.id.toString(),
@@ -153,10 +164,10 @@ describe("PrismaQuoteRepository", () => {
       const anotherCustomer = makeCustomer("Another Customer");
       await customerRepository.save(anotherCustomer);
 
-      const quote1 = Quote.create({});
-      const quote2 = Quote.create({});
-      await quoteRepository.save(quote1, testCustomer.id.toString());
-      await quoteRepository.save(quote2, anotherCustomer.id.toString());
+      const quote1 = makeQuote({});
+      const quote2 = makeQuote({}, anotherCustomer.id.toString());
+      await quoteRepository.save(quote1);
+      await quoteRepository.save(quote2);
 
       const quotes = await quoteRepository.findByCustomerId(
         testCustomer.id.toString(),
@@ -169,12 +180,12 @@ describe("PrismaQuoteRepository", () => {
 
   describe("findByStatus", () => {
     test("should return quotes with matching status", async () => {
-      const draftQuote = Quote.create({ status: QuoteStatus.DRAFT });
-      const submittedQuote = Quote.create({ status: QuoteStatus.DRAFT });
+      const draftQuote = makeQuote({ status: QuoteStatus.DRAFT });
+      const submittedQuote = makeQuote({ status: QuoteStatus.DRAFT });
       submittedQuote.submit();
 
-      await quoteRepository.save(draftQuote, testCustomer.id.toString());
-      await quoteRepository.save(submittedQuote, testCustomer.id.toString());
+      await quoteRepository.save(draftQuote);
+      await quoteRepository.save(submittedQuote);
 
       const drafts = await quoteRepository.findByStatus(QuoteStatus.DRAFT);
       const submitted = await quoteRepository.findByStatus(
@@ -186,8 +197,8 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should return empty array when no quotes match status", async () => {
-      const quote = Quote.create({ status: QuoteStatus.DRAFT });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({ status: QuoteStatus.DRAFT });
+      await quoteRepository.save(quote);
 
       const ready = await quoteRepository.findByStatus(QuoteStatus.READY);
       expect(ready).toHaveLength(0);
@@ -197,8 +208,8 @@ describe("PrismaQuoteRepository", () => {
   describe("findAll", () => {
     test("should return paginated quotes", async () => {
       for (let i = 1; i <= 15; i++) {
-        const quote = Quote.create({});
-        await quoteRepository.save(quote, testCustomer.id.toString());
+        const quote = makeQuote({});
+        await quoteRepository.save(quote);
       }
 
       const result = await quoteRepository.findAll({ page: 1, perPage: 10 });
@@ -214,10 +225,10 @@ describe("PrismaQuoteRepository", () => {
       const anotherCustomer = makeCustomer("Another Customer");
       await customerRepository.save(anotherCustomer);
 
-      const quote1 = Quote.create({});
-      const quote2 = Quote.create({});
-      await quoteRepository.save(quote1, testCustomer.id.toString());
-      await quoteRepository.save(quote2, anotherCustomer.id.toString());
+      const quote1 = makeQuote({});
+      const quote2 = makeQuote({}, anotherCustomer.id.toString());
+      await quoteRepository.save(quote1);
+      await quoteRepository.save(quote2);
 
       const result = await quoteRepository.findAll(
         { page: 1, perPage: 10 },
@@ -229,12 +240,12 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should filter by status", async () => {
-      const draftQuote = Quote.create({ status: QuoteStatus.DRAFT });
-      const submittedQuote = Quote.create({ status: QuoteStatus.DRAFT });
+      const draftQuote = makeQuote({ status: QuoteStatus.DRAFT });
+      const submittedQuote = makeQuote({ status: QuoteStatus.DRAFT });
       submittedQuote.submit();
 
-      await quoteRepository.save(draftQuote, testCustomer.id.toString());
-      await quoteRepository.save(submittedQuote, testCustomer.id.toString());
+      await quoteRepository.save(draftQuote);
+      await quoteRepository.save(submittedQuote);
 
       const result = await quoteRepository.findAll(
         { page: 1, perPage: 10 },
@@ -245,8 +256,8 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should filter by date range", async () => {
-      const quote = Quote.create({});
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({});
+      await quoteRepository.save(quote);
 
       const startDate = new Date();
       startDate.setHours(0, 0, 0, 0);
@@ -262,8 +273,8 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should use default pagination when not provided", async () => {
-      const quote = Quote.create({});
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({});
+      await quoteRepository.save(quote);
 
       const result = await quoteRepository.findAll();
 
@@ -276,8 +287,8 @@ describe("PrismaQuoteRepository", () => {
     test("should return versions of a quote", async () => {
       // This test depends on how versioning is implemented
       // For now, we test the basic functionality
-      const quote = Quote.create({ version: 1 });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({ version: 1 });
+      await quoteRepository.save(quote);
 
       // Without explicit parentId support, this will return empty
       const versions = await quoteRepository.findVersions(quote.id.toString());
@@ -287,8 +298,8 @@ describe("PrismaQuoteRepository", () => {
 
   describe("delete", () => {
     test("should delete an existing quote", async () => {
-      const quote = Quote.create({});
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({});
+      await quoteRepository.save(quote);
 
       await quoteRepository.delete(quote.id.toString());
 
@@ -297,10 +308,10 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should cascade delete quote items", async () => {
-      const quote = Quote.create({
+      const quote = makeQuote({
         items: [makeItem(100, 1), makeItem(50, 2)],
       });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       await quoteRepository.delete(quote.id.toString());
 
@@ -315,17 +326,17 @@ describe("PrismaQuoteRepository", () => {
 
   describe("data integrity", () => {
     test("should preserve quote status", async () => {
-      const quote = Quote.create({ status: QuoteStatus.DRAFT });
+      const quote = makeQuote({ status: QuoteStatus.DRAFT });
       quote.submit();
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
       expect(found?.status).toBe(QuoteStatus.SUBMITTED);
     });
 
     test("should preserve quote version", async () => {
-      const quote = Quote.create({ version: 5 });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({ version: 5 });
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
       expect(found?.version).toBe(5);
@@ -345,8 +356,8 @@ describe("PrismaQuoteRepository", () => {
         description: "Service",
       });
 
-      const quote = Quote.create({ items: [partItem, serviceItem] });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      const quote = makeQuote({ items: [partItem, serviceItem] });
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
       const types = found?.items.map((i) => i.type).sort();
@@ -354,14 +365,14 @@ describe("PrismaQuoteRepository", () => {
     });
 
     test("should calculate totals correctly", async () => {
-      const quote = Quote.create({
+      const quote = makeQuote({
         items: [
           makeItem(100, 2), // 200
           makeItem(50, 3), // 150
           makeItem(25, 4), // 100
         ],
       });
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
 
       const found = await quoteRepository.findById(quote.id.toString());
       expect(found?.subtotal).toBe(450);
@@ -370,9 +381,9 @@ describe("PrismaQuoteRepository", () => {
 
     test("should preserve custom id", async () => {
       const customId = new UniqueEntityId("custom-quote-uuid");
-      const quote = Quote.create({}, customId);
+      const quote = makeQuote({}, testCustomer.id.toString(), customId);
 
-      await quoteRepository.save(quote, testCustomer.id.toString());
+      await quoteRepository.save(quote);
       const found = await quoteRepository.findById("custom-quote-uuid");
 
       expect(found).not.toBeNull();
