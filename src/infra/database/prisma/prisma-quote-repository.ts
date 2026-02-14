@@ -23,16 +23,13 @@ export class PrismaQuoteRepository implements QuoteRepository {
     this.prisma = prisma ?? prismaClient;
   }
 
-  async save(quote: Quote, customerId?: string): Promise<void> {
+  async save(quote: Quote): Promise<void> {
     const exists = await this.exists(quote.id.toString());
 
     if (exists) {
       await this.update(quote);
     } else {
-      if (!customerId) {
-        throw new Error("customerId is required when creating a new quote");
-      }
-      await this.create(quote, customerId);
+      await this.create(quote);
     }
   }
 
@@ -178,9 +175,9 @@ export class PrismaQuoteRepository implements QuoteRepository {
     };
   }
 
-  private async create(quote: Quote, customerId: string): Promise<void> {
+  private async create(quote: Quote): Promise<void> {
     await this.prisma.quote.create({
-      data: PrismaQuoteMapper.toPersistence(quote, customerId),
+      data: PrismaQuoteMapper.toPersistence(quote),
     });
   }
 
@@ -190,6 +187,4 @@ export class PrismaQuoteRepository implements QuoteRepository {
       data: PrismaQuoteMapper.toUpdatePersistence(quote),
     });
   }
-
-
 }
