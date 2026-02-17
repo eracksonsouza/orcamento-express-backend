@@ -10,6 +10,7 @@ import { paginate } from "./helpers/paginate";
 
 export class InMemoryVehicleRepository implements VehicleRepository {
   public items: Vehicle[] = [];
+  private vehiclesByCustomer: Map<string, Set<string>> = new Map();
 
   async save(vehicle: Vehicle): Promise<void> {
     const index = this.items.findIndex(
@@ -35,8 +36,14 @@ export class InMemoryVehicleRepository implements VehicleRepository {
     );
   }
 
-  async findByCustomerId(_customerId: string): Promise<Vehicle[]> {
-    return [];
+  async findByCustomerId(customerId: string): Promise<Vehicle[]> {
+    const vehicleIds = this.vehiclesByCustomer.get(customerId);
+
+    if (!vehicleIds) {
+      return [];
+    }
+
+    return this.items.filter((vehicle) => vehicleIds.has(vehicle.id.toString()));
   }
 
   async findAll(params?: PaginationParams): Promise<PaginatedResult<Vehicle>> {
@@ -72,5 +79,11 @@ export class InMemoryVehicleRepository implements VehicleRepository {
     return this.items.some(
       (vehicle) => vehicle.licensePlate.value === licensePlate,
     );
+  }
+
+  attachVehicleToCustomer(customerId: string, vehicleId: string): void {
+    const current = this.vehiclesByCustomer.get(customerId) ?? new Set<string>();
+    current.add(vehicleId);
+    this.vehiclesByCustomer.set(customerId, current);
   }
 }
