@@ -37,7 +37,7 @@ export class UpdateQuoteItemUseCase {
       ...(description !== undefined ? { description } : {}),
     });
 
-    await this.quoteRepository.update(quote);
+    await this.quoteRepository.save(quote);
 
     return {
       quoteId: quote.id.toString(),

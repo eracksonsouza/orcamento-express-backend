@@ -28,12 +28,6 @@ describe("Submit Quote", () => {
   test("should be able to submit a draft quote with items", async () => {
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.DRAFT,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
 
     await addQuoteItem.execute({
@@ -70,12 +64,6 @@ describe("Submit Quote", () => {
   test("should throw when quote is empty", async () => {
     const { quote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.DRAFT,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
 
     await expect(
@@ -88,12 +76,18 @@ describe("Submit Quote", () => {
   test("should throw when quote is already submitted", async () => {
     const { quote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.SUBMITTED,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
+    });
+
+    await addQuoteItem.execute({
+      quoteId: quote.id.toString(),
+      description: "Item 1",
+      quantity: 1,
+      unitPrice: 10,
+      type: QuoteItemType.PART,
+    });
+
+    await submitQuote.execute({
+      quoteId: quote.id.toString(),
     });
 
     await expect(
@@ -106,13 +100,11 @@ describe("Submit Quote", () => {
   test("should throw when quote status cannot transition to submitted", async () => {
     const { quote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.GENERATING,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
+
+    quote.changeStatus(QuoteStatus.SUBMITTED);
+    quote.changeStatus(QuoteStatus.GENERATING);
+    await inMemoryQuoteRepository.save(quote);
 
     await expect(
       submitQuote.execute({

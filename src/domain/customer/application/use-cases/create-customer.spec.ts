@@ -14,7 +14,7 @@ describe("Create Quetion", () => {
 
     const { customer } = await sut.execute({
       customerId: "123",
-      nome: "John Doe",
+      name: "John Doe",
       email: "john.doe@example.com",
       phone: "123-456-7890",
     });

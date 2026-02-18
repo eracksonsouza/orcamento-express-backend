@@ -22,12 +22,6 @@ describe("Create New Quote Version", () => {
   test("should be able to create a new quote version", async () => {
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.SUBMITTED,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
 
     await addQuoteItem.execute({
@@ -37,6 +31,9 @@ describe("Create New Quote Version", () => {
       unitPrice: 100,
       type: QuoteItemType.SERVICE,
     });
+
+    createdQuote.changeStatus(QuoteStatus.SUBMITTED);
+    await inMemoryQuoteRepository.save(createdQuote);
 
     const { quote: newQuoteVersion } = await sut.execute({
       quoteId: createdQuote.id.toString(),

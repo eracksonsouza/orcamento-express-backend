@@ -2,7 +2,6 @@ import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote
 import { CreateQuoteUseCase } from "./create-quote";
 import { AddQuoteItemUseCase } from "./add-quote-item";
 import { GetQuoteUseCase } from "./get-quote";
-import { QuoteStatus } from "../../enterprise/enums/quote-status";
 import { QuoteItemType } from "../../enterprise/enums/quote-item-type";
 import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-error";
 
@@ -22,12 +21,6 @@ describe("Add Quote Item", () => {
   test("should be able to add a quote item", async () => {
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 1000,
-      status: QuoteStatus.DRAFT,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
 
     await addQuoteItem.execute({

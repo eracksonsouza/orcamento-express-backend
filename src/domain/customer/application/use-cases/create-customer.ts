@@ -1,14 +1,12 @@
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import type { CustomerRepository } from "@/src/domain/customer/application/repositories/customer-repository";
 import { Customer } from "@/src/domain/customer/enterprise/entities/customer";
-import type { Vehicle } from "@prisma/client";
 
 interface CreateCustomerRequest {
   customerId: string;
-  nome: string;
+  name: string;
   email: string;
   phone: string;
-  vehicles?: Vehicle[];
 }
 
 interface CreateCustomerResponse {
@@ -20,13 +18,13 @@ export class CreateCustomerUseCase {
 
   async execute({
     customerId,
-    nome,
+    name,
     email,
     phone,
   }: CreateCustomerRequest): Promise<CreateCustomerResponse> {
     const customer = Customer.create(
       {
-        name: nome,
+        name,
         email,
         phone,
         createdAt: new Date(),

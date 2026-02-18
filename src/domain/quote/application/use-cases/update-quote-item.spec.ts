@@ -3,7 +3,6 @@ import { CreateQuoteUseCase } from "./create-quote";
 import { AddQuoteItemUseCase } from "./add-quote-item";
 import { GetQuoteUseCase } from "./get-quote";
 import { UpdateQuoteItemUseCase } from "./update-quote-item";
-import { QuoteStatus } from "../../enterprise/enums/quote-status";
 import { QuoteItemType } from "../../enterprise/enums/quote-item-type";
 import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-error";
 import { InvalidQuoteItemError } from "../../enterprise/errors/invalid-quote-item-error";
@@ -26,12 +25,6 @@ describe("Update Quote Item", () => {
   test("should be able to update a quote item", async () => {
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.DRAFT,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
 
     await addQuoteItem.execute({
@@ -87,12 +80,6 @@ describe("Update Quote Item", () => {
   test("should throw when quote item does not exist", async () => {
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 0,
-      status: QuoteStatus.DRAFT,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
     });
 
     await expect(
