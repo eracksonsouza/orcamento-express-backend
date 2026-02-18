@@ -26,6 +26,6 @@ export class RemoveQuoteItemUseCase {
 
     await this.quoteRepository.save(quote);
 
-    return { quoteId };
+    return { quoteId: quote.id.toString() };
   }
 }

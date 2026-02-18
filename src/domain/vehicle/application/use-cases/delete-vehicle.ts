@@ -21,6 +21,6 @@ export class DeleteVehicleUseCase {
 
     await this.vehicleRepository.delete(vehicleId);
 
-    return { vehicleId };
+    return { vehicleId: vehicle.id.toString() };
   }
 }
