@@ -16,14 +16,14 @@ describe("List Customers", () => {
   test("should be able to list customers", async () => {
     await createCustomer.execute({
       customerId: "1",
-      nome: "John Doe",
+      name: "John Doe",
       email: "john@example.com",
       phone: "111111111",
     });
 
     await createCustomer.execute({
       customerId: "2",
-      nome: "Jane Doe",
+      name: "Jane Doe",
       email: "jane@example.com",
       phone: "222222222",
     });
@@ -46,14 +46,14 @@ describe("List Customers", () => {
   test("should be able to search customers by query", async () => {
     await createCustomer.execute({
       customerId: "1",
-      nome: "John Doe",
+      name: "John Doe",
       email: "john@example.com",
       phone: "111111111",
     });
 
     await createCustomer.execute({
       customerId: "2",
-      nome: "Jane Doe",
+      name: "Jane Doe",
       email: "jane@example.com",
       phone: "222222222",
     });

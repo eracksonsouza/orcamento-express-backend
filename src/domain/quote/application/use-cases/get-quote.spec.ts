@@ -2,7 +2,6 @@ import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote
 import { CreateQuoteUseCase } from "./create-quote";
 import { GetQuoteUseCase } from "./get-quote";
 import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-error";
-import { QuoteStatus } from "../../enterprise/enums/quote-status";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
 let createQuote: CreateQuoteUseCase;
@@ -18,12 +17,6 @@ describe("Get Quote", () => {
   test("should be able to get a quote by id", async () => {
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
-      value: 1000,
-      status: QuoteStatus.DRAFT,
-      version: 1,
-      items: [],
-      subtotal: 1000,
-      total: 1000,
     });
 
     const { quote } = await sut.execute({

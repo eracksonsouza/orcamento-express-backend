@@ -18,15 +18,29 @@ describe("List quotes", () => {
     customerId: string,
     status: QuoteStatus = QuoteStatus.DRAFT,
   ): Promise<void> {
-    await createQuote.execute({
-      customerId,
-      value: 0,
-      status,
-      version: 1,
-      items: [],
-      subtotal: 0,
-      total: 0,
-    });
+    const { quote } = await createQuote.execute({ customerId });
+
+    if (status === QuoteStatus.DRAFT) {
+      return;
+    }
+
+    quote.changeStatus(QuoteStatus.SUBMITTED);
+
+    if (status === QuoteStatus.GENERATING) {
+      quote.changeStatus(QuoteStatus.GENERATING);
+    }
+
+    if (status === QuoteStatus.READY) {
+      quote.changeStatus(QuoteStatus.GENERATING);
+      quote.changeStatus(QuoteStatus.READY);
+    }
+
+    if (status === QuoteStatus.FAILED) {
+      quote.changeStatus(QuoteStatus.GENERATING);
+      quote.changeStatus(QuoteStatus.FAILED);
+    }
+
+    await inMemoryQuoteRepository.save(quote);
   }
 
   test("should return empty list when no quotes exist", async () => {
