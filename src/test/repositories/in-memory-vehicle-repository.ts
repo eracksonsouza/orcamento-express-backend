@@ -9,6 +9,9 @@ import type {
 import { paginate } from "./helpers/paginate";
 
 export class InMemoryVehicleRepository implements VehicleRepository {
+  create(arg0: { vehicleId: string; brand: string; model: string; year: number; licensePlate: string; type: string; }) {
+      throw new Error("Method not implemented.");
+  }
   public items: Vehicle[] = [];
   private vehiclesByCustomer: Map<string, Set<string>> = new Map();
 
