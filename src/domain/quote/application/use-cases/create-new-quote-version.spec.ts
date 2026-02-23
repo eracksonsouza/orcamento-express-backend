@@ -1,4 +1,6 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
 import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-error";
 import { QuoteStatus } from "../../enterprise/enums/quote-status";
 import { QuoteItemType } from "../../enterprise/enums/quote-item-type";
@@ -7,6 +9,8 @@ import { CreateNewQuoteVersionUseCase } from "./create-new-quote-version";
 import { CreateQuoteUseCase } from "./create-quote";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
+let createCustomer: CreateCustomerUseCase;
 let createQuote: CreateQuoteUseCase;
 let addQuoteItem: AddQuoteItemUseCase;
 let sut: CreateNewQuoteVersionUseCase;
@@ -14,12 +18,24 @@ let sut: CreateNewQuoteVersionUseCase;
 describe("Create New Quote Version", () => {
   beforeEach(() => {
     inMemoryQuoteRepository = new InMemoryQuoteRepository();
-    createQuote = new CreateQuoteUseCase(inMemoryQuoteRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
+    createQuote = new CreateQuoteUseCase(
+      inMemoryQuoteRepository,
+      inMemoryCustomerRepository,
+    );
     addQuoteItem = new AddQuoteItemUseCase(inMemoryQuoteRepository);
     sut = new CreateNewQuoteVersionUseCase(inMemoryQuoteRepository);
   });
 
   test("should be able to create a new quote version", async () => {
+    await createCustomer.execute({
+      customerId: "customer-123",
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "111111111",
+    });
+
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
     });

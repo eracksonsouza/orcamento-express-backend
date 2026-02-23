@@ -1,4 +1,6 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
 import { AddQuoteItemUseCase } from "./add-quote-item";
 import { CreateQuoteUseCase } from "./create-quote";
 import { GetQuoteUseCase } from "./get-quote";
@@ -11,18 +13,32 @@ import { QuoteAlreadySubmittedError } from "../../enterprise/errors/quote-alread
 import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-error";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
+let createCustomer: CreateCustomerUseCase;
 let createQuote: CreateQuoteUseCase;
 let addQuoteItem: AddQuoteItemUseCase;
 let getQuote: GetQuoteUseCase;
 let submitQuote: SubmitQuoteUseCase;
 
 describe("Submit Quote", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     inMemoryQuoteRepository = new InMemoryQuoteRepository();
-    createQuote = new CreateQuoteUseCase(inMemoryQuoteRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
+    createQuote = new CreateQuoteUseCase(
+      inMemoryQuoteRepository,
+      inMemoryCustomerRepository,
+    );
     addQuoteItem = new AddQuoteItemUseCase(inMemoryQuoteRepository);
     getQuote = new GetQuoteUseCase(inMemoryQuoteRepository);
     submitQuote = new SubmitQuoteUseCase(inMemoryQuoteRepository);
+
+    await createCustomer.execute({
+      customerId: "customer-123",
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "111111111",
+    });
   });
 
   test("should be able to submit a draft quote with items", async () => {
