@@ -13,6 +13,8 @@ export class PrismaQuoteItemMapper {
         description: raw.description,
         quantity: raw.quantity,
         unitPrice: Number(raw.unitPrice),
+        discount: Number(raw.discount),
+        taxes: Number(raw.taxes),
         type: raw.type as QuoteItemType,
       },
       new UniqueEntityId(raw.id),
@@ -30,8 +32,8 @@ export class PrismaQuoteItemMapper {
       description: item.description ?? "",
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      discount: 0,
-      taxes: 0,
+      discount: item.discount,
+      taxes: item.taxes,
       type: item.type,
     }));
   }

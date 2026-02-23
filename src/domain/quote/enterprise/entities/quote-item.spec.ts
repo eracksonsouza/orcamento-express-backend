@@ -25,8 +25,10 @@ test("should validate unitPrice >= 0", () => {
     unitPrice: 0,
     quantity: 1,
     type: QuoteItemType.SERVICE,
+    serviceCategory: "LAVAGEM",
   });
   expect(zeroPrice.unitPrice).toBe(0);
+  expect(zeroPrice.serviceCategory).toBe("LAVAGEM");
 });
 
 test("should validate type PART or SERVICE", () => {
@@ -61,4 +63,70 @@ test("should calculate total correctly", () => {
   });
 
   expect(item.calculateTotal()).toBe(102);
+});
+
+test("should calculate total with item discount and taxes", () => {
+  const item = QuoteItem.create({
+    unitPrice: 100,
+    quantity: 2,
+    discount: 30,
+    taxes: 15,
+    type: QuoteItemType.SERVICE,
+    serviceCategory: "MANUTENCAO",
+  });
+
+  expect(item.discount).toBe(30);
+  expect(item.taxes).toBe(15);
+  expect(item.calculateTotal()).toBe(185); // 200 - 30 + 15
+});
+
+test("should validate item discount and taxes >= 0", () => {
+  expect(() =>
+    QuoteItem.create({
+      unitPrice: 100,
+      quantity: 1,
+      discount: -1,
+      type: QuoteItemType.PART,
+    }),
+  ).toThrowError("Discount must be greater than or equal to 0");
+
+  expect(() =>
+    QuoteItem.create({
+      unitPrice: 100,
+      quantity: 1,
+      taxes: -1,
+      type: QuoteItemType.PART,
+    }),
+  ).toThrowError("Taxes must be greater than or equal to 0");
+});
+
+test("should allow service category only for SERVICE items", () => {
+  const serviceItem = QuoteItem.create({
+    unitPrice: 150,
+    quantity: 1,
+    type: QuoteItemType.SERVICE,
+    serviceCategory: "PINTURA",
+  });
+
+  expect(serviceItem.serviceCategory).toBe("PINTURA");
+
+  expect(() =>
+    QuoteItem.create({
+      unitPrice: 100,
+      quantity: 1,
+      type: QuoteItemType.PART,
+      serviceCategory: "MANUTENCAO",
+    }),
+  ).toThrowError("Service category is only allowed for SERVICE items");
+});
+
+test("should validate service category values", () => {
+  expect(() =>
+    QuoteItem.create({
+      unitPrice: 120,
+      quantity: 1,
+      type: QuoteItemType.SERVICE,
+      serviceCategory: "POLIMENTO" as any,
+    }),
+  ).toThrowError("Invalid service category: POLIMENTO");
 });

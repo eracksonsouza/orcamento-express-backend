@@ -1,0 +1,136 @@
+import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { InMemoryVehicleRepository } from "@/src/test/repositories/in-memory-vehicle-repository";
+import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
+import { CreateQuoteUseCase } from "./create-quote";
+import { GetQuoteUseCase } from "./get-quote";
+import { CreateVehicleUseCase } from "@/src/domain/vehicle/application/use-cases/create-vehicle";
+import { VehicleType } from "@/src/domain/vehicle/enterprise/enums/vehicle-type";
+import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-error";
+import { VehicleNotFoundError } from "@/src/domain/vehicle/enterprise/errors/vehicle-not-found-error";
+import { AssignVehicleToQuoteUseCase } from "./assign-vehicle-to-quote";
+
+let inMemoryQuoteRepository: InMemoryQuoteRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
+let inMemoryVehicleRepository: InMemoryVehicleRepository;
+let createCustomer: CreateCustomerUseCase;
+let createQuote: CreateQuoteUseCase;
+let getQuote: GetQuoteUseCase;
+let createVehicle: CreateVehicleUseCase;
+let sut: AssignVehicleToQuoteUseCase;
+
+describe("Assign Vehicle To Quote", () => {
+  beforeEach(async () => {
+    inMemoryQuoteRepository = new InMemoryQuoteRepository();
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    inMemoryVehicleRepository = new InMemoryVehicleRepository();
+
+    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
+    createQuote = new CreateQuoteUseCase(
+      inMemoryQuoteRepository,
+      inMemoryCustomerRepository,
+    );
+    getQuote = new GetQuoteUseCase(inMemoryQuoteRepository);
+    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository);
+    sut = new AssignVehicleToQuoteUseCase(
+      inMemoryQuoteRepository,
+      inMemoryVehicleRepository,
+    );
+
+    await createCustomer.execute({
+      customerId: "customer-123",
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "111111111",
+    });
+
+    await createCustomer.execute({
+      customerId: "customer-456",
+      name: "Jane Doe",
+      email: "jane@example.com",
+      phone: "222222222",
+    });
+  });
+
+  test("should be able to assign a vehicle to quote when vehicle belongs to quote customer", async () => {
+    const { quote } = await createQuote.execute({
+      customerId: "customer-123",
+    });
+
+    const { vehicle } = await createVehicle.execute({
+      vehicleId: "vehicle-123",
+      brand: "Toyota",
+      model: "Corolla",
+      year: 2023,
+      licensePlate: "ABC1234",
+      type: VehicleType.CAR,
+    });
+
+    inMemoryVehicleRepository.attachVehicleToCustomer(
+      "customer-123",
+      vehicle.id.toString(),
+    );
+
+    const response = await sut.execute({
+      quoteId: quote.id.toString(),
+      vehicleId: vehicle.id.toString(),
+    });
+
+    const { quote: updatedQuote } = await getQuote.execute({
+      quoteId: quote.id.toString(),
+    });
+
+    expect(response.quoteId).toBe(quote.id.toString());
+    expect(response.vehicleId).toBe(vehicle.id.toString());
+    expect(updatedQuote.vehicleId).toBe(vehicle.id.toString());
+  });
+
+  test("should throw when quote does not exist", async () => {
+    await expect(
+      sut.execute({
+        quoteId: "non-existent-quote",
+        vehicleId: "vehicle-123",
+      }),
+    ).rejects.toBeInstanceOf(QuoteNotFoundError);
+  });
+
+  test("should throw when vehicle does not exist", async () => {
+    const { quote } = await createQuote.execute({
+      customerId: "customer-123",
+    });
+
+    await expect(
+      sut.execute({
+        quoteId: quote.id.toString(),
+        vehicleId: "non-existent-vehicle",
+      }),
+    ).rejects.toBeInstanceOf(VehicleNotFoundError);
+  });
+
+  test("should throw when vehicle does not belong to quote customer", async () => {
+    const { quote } = await createQuote.execute({
+      customerId: "customer-123",
+    });
+
+    const { vehicle } = await createVehicle.execute({
+      vehicleId: "vehicle-999",
+      brand: "Honda",
+      model: "Civic",
+      year: 2022,
+      licensePlate: "XYZ9876",
+      type: VehicleType.CAR,
+    });
+
+    inMemoryVehicleRepository.attachVehicleToCustomer(
+      "customer-456",
+      vehicle.id.toString(),
+    );
+
+    await expect(
+      sut.execute({
+        quoteId: quote.id.toString(),
+        vehicleId: vehicle.id.toString(),
+      }),
+    ).rejects.toThrow("Vehicle does not belong to quote customer");
+  });
+});

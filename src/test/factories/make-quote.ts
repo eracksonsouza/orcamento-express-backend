@@ -12,10 +12,15 @@ export function makeQuote(
   const quote = Quote.create(
     {
       customerId: new UniqueEntityId().toString(),
+      vehicleId: null,
       items: [],
       status: QuoteStatus.DRAFT,
       version: 1,
       subtotal: 0,
+      discount: 0,
+      taxes: 0,
+      paymentDiscount: 0,
+      paymentMethod: "UNSPECIFIED",
       total: 0,
       value: 0,
       createdAt: new Date(),

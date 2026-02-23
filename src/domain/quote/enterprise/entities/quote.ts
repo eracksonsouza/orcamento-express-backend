@@ -10,14 +10,34 @@ import { InvalidQuoteItemError } from "@/src/domain/quote/enterprise/errors/inva
 import { QuoteItem } from "./quote-item";
 import { calculateQuoteTotals } from "@/src/shared/utils/quote/calculate-totals";
 
+export type QuotePaymentMethod =
+  | "UNSPECIFIED"
+  | "CASH"
+  | "PIX"
+  | "CARD"
+  | "BANK_TRANSFER";
+
+const QUOTE_PAYMENT_METHODS: QuotePaymentMethod[] = [
+  "UNSPECIFIED",
+  "CASH",
+  "PIX",
+  "CARD",
+  "BANK_TRANSFER",
+];
+
 export interface QuoteProps {
   value: number;
   description?: string | null;
   customerId: string;
+  vehicleId?: string | null;
   status: QuoteStatus;
   version: number;
   items: QuoteItem[];
   subtotal: number;
+  discount: number;
+  taxes: number;
+  paymentDiscount: number;
+  paymentMethod: QuotePaymentMethod;
   total: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,6 +48,13 @@ interface UpdateQuoteItemProps {
   quantity: number;
   type: QuoteItemType;
   description?: string | null;
+}
+
+interface UpdateQuoteCommercialTermsProps {
+  discount?: number;
+  taxes?: number;
+  paymentDiscount?: number;
+  paymentMethod?: QuotePaymentMethod;
 }
 
 export class Quote extends Entity<QuoteProps> {
@@ -42,6 +69,10 @@ export class Quote extends Entity<QuoteProps> {
     return this.props.status;
   }
 
+  get vehicleId(): string | null | undefined {
+    return this.props.vehicleId;
+  }
+
   get version(): number {
     return this.props.version;
   }
@@ -52,6 +83,22 @@ export class Quote extends Entity<QuoteProps> {
 
   get subtotal(): number {
     return this.props.subtotal;
+  }
+
+  get discount(): number {
+    return this.props.discount;
+  }
+
+  get taxes(): number {
+    return this.props.taxes;
+  }
+
+  get paymentDiscount(): number {
+    return this.props.paymentDiscount;
+  }
+
+  get paymentMethod(): QuotePaymentMethod {
+    return this.props.paymentMethod;
   }
 
   get total(): number {
@@ -79,6 +126,57 @@ export class Quote extends Entity<QuoteProps> {
   updateDescription(description: string | null): void {
     this.assertEditable();
     this.props.description = description;
+    this.touch();
+  }
+
+  assignVehicle(vehicleId: string, vehicleCustomerId: string): void {
+    this.assertEditable();
+
+    if (vehicleCustomerId !== this.props.customerId) {
+      throw new Error("Vehicle does not belong to quote customer");
+    }
+
+    this.props.vehicleId = vehicleId;
+    this.touch();
+  }
+
+  unassignVehicle(): void {
+    this.assertEditable();
+    this.props.vehicleId = null;
+    this.touch();
+  }
+
+  updateCommercialTerms({
+    discount,
+    taxes,
+    paymentDiscount,
+    paymentMethod,
+  }: UpdateQuoteCommercialTermsProps): void {
+    this.assertEditable();
+
+    if (discount !== undefined) {
+      this.assertNonNegative(discount, "Discount");
+      this.props.discount = discount;
+    }
+
+    if (taxes !== undefined) {
+      this.assertNonNegative(taxes, "Taxes");
+      this.props.taxes = taxes;
+    }
+
+    if (paymentDiscount !== undefined) {
+      this.assertNonNegative(paymentDiscount, "Payment discount");
+      this.props.paymentDiscount = paymentDiscount;
+    }
+
+    if (paymentMethod !== undefined) {
+      if (!QUOTE_PAYMENT_METHODS.includes(paymentMethod)) {
+        throw new Error(`Invalid payment method: ${paymentMethod}`);
+      }
+      this.props.paymentMethod = paymentMethod;
+    }
+
+    this.recalculateTotals();
     this.touch();
   }
 
@@ -119,6 +217,9 @@ export class Quote extends Entity<QuoteProps> {
         unitPrice,
         quantity,
         type,
+        serviceCategory: currentItem.serviceCategory,
+        discount: currentItem.discount,
+        taxes: currentItem.taxes,
         description: description ?? currentItem.description,
         createdAt: currentItem.createdAt,
         updatedAt: new Date(),
@@ -161,10 +262,20 @@ export class Quote extends Entity<QuoteProps> {
   }
 
   private recalculateTotals(): void {
-    const totals = calculateQuoteTotals(this.props.items);
+    const totals = calculateQuoteTotals(this.props.items, {
+      discount: this.props.discount,
+      taxes: this.props.taxes,
+      paymentDiscount: this.props.paymentDiscount,
+    });
     this.props.subtotal = totals.subtotal;
     this.props.total = totals.total;
     this.props.value = totals.value;
+  }
+
+  private assertNonNegative(value: number, fieldName: string): void {
+    if (value < 0) {
+      throw new Error(`${fieldName} must be greater than or equal to 0`);
+    }
   }
 
   private assertEditable(): void {
@@ -187,16 +298,27 @@ export class Quote extends Entity<QuoteProps> {
         customerId: props.customerId!,
         value: props.value ?? 0,
         description: props.description ?? null,
+        vehicleId: props.vehicleId ?? null,
         status: props.status ?? QuoteStatus.DRAFT,
         version: props.version ?? 1,
         items: props.items ?? [],
         subtotal: props.subtotal ?? 0,
+        discount: props.discount ?? 0,
+        taxes: props.taxes ?? 0,
+        paymentDiscount: props.paymentDiscount ?? 0,
+        paymentMethod: props.paymentMethod ?? "UNSPECIFIED",
         total: props.total ?? 0,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
       resolvedId,
     );
+    quote.assertNonNegative(quote.discount, "Discount");
+    quote.assertNonNegative(quote.taxes, "Taxes");
+    quote.assertNonNegative(quote.paymentDiscount, "Payment discount");
+    if (!QUOTE_PAYMENT_METHODS.includes(quote.paymentMethod)) {
+      throw new Error(`Invalid payment method: ${quote.paymentMethod}`);
+    }
     quote.recalculateTotals();
     return quote;
   }
