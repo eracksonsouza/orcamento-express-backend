@@ -126,4 +126,70 @@ describe("Quote Entity", () => {
     expect(cloned.items).not.toBe(original.items); // shallow copy of array
     expect(cloned.items[0]).toBe(original.items[0]); // same items reused
   });
+
+  test("assigns vehicle only when vehicle belongs to quote customer", () => {
+    const quote = Quote.create({
+      customerId: "customer-1",
+    });
+
+    quote.assignVehicle("vehicle-1", "customer-1");
+    expect(quote.vehicleId).toBe("vehicle-1");
+
+    expect(() => quote.assignVehicle("vehicle-2", "customer-2")).toThrow(
+      "Vehicle does not belong to quote customer",
+    );
+  });
+
+  test("updates commercial terms and recalculates totals", () => {
+    const quote = Quote.create({
+      items: [makeItem(100, 2)], // 200
+    });
+
+    quote.updateCommercialTerms({
+      discount: 20,
+      taxes: 10,
+      paymentDiscount: 5,
+      paymentMethod: "PIX",
+    });
+
+    expect(quote.discount).toBe(20);
+    expect(quote.taxes).toBe(10);
+    expect(quote.paymentDiscount).toBe(5);
+    expect(quote.paymentMethod).toBe("PIX");
+    expect(quote.subtotal).toBe(200);
+    expect(quote.total).toBe(185); // 200 - 20 - 5 + 10
+    expect(quote.value).toBe(185);
+  });
+
+  test("combines item discounts/taxes with quote commercial terms", () => {
+    const quote = Quote.create({
+      items: [
+        QuoteItem.create({
+          unitPrice: 100,
+          quantity: 2,
+          discount: 20,
+          taxes: 5,
+          type: QuoteItemType.SERVICE,
+          serviceCategory: "PINTURA",
+        }), // bruto 200, liquido item 185
+        QuoteItem.create({
+          unitPrice: 50,
+          quantity: 1,
+          type: QuoteItemType.PART,
+        }), // bruto 50, liquido item 50
+      ],
+    });
+
+    quote.updateCommercialTerms({
+      discount: 10,
+      taxes: 5,
+      paymentDiscount: 5,
+      paymentMethod: "PIX",
+    });
+
+    expect(quote.subtotal).toBe(250); // soma bruta dos itens
+    expect(quote.total).toBe(225); // (185 + 50) - 10 - 5 + 5
+    expect(quote.value).toBe(225);
+    expect(quote.paymentMethod).toBe("PIX");
+  });
 });
