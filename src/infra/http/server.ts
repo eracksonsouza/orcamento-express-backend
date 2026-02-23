@@ -1,14 +1,8 @@
-import Fastify from "fastify";
-
-const server = Fastify({
-  logger: true,
-});
-
-server.get("/health", async () => {
-  return { status: "ok", timestamp: new Date().toISOString() };
-});
+import { buildApp } from "./app";
 
 const start = async () => {
+  const server = await buildApp();
+
   try {
     await server.listen({ port: 3333, host: "0.0.0.0" });
     console.log("🚀 Server running on http://localhost:3333");
