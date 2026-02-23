@@ -1,4 +1,6 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
 import { CreateQuoteUseCase } from "./create-quote";
 import { AddQuoteItemUseCase } from "./add-quote-item";
 import { GetQuoteUseCase } from "./get-quote";
@@ -8,6 +10,8 @@ import { QuoteNotFoundError } from "../../enterprise/errors/quote-not-found-erro
 import { InvalidQuoteItemError } from "../../enterprise/errors/invalid-quote-item-error";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
+let createCustomer: CreateCustomerUseCase;
 let createQuote: CreateQuoteUseCase;
 let addQuoteItem: AddQuoteItemUseCase;
 let updateQuoteItem: UpdateQuoteItemUseCase;
@@ -16,13 +20,25 @@ let getQuote: GetQuoteUseCase;
 describe("Update Quote Item", () => {
   beforeEach(() => {
     inMemoryQuoteRepository = new InMemoryQuoteRepository();
-    createQuote = new CreateQuoteUseCase(inMemoryQuoteRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
+    createQuote = new CreateQuoteUseCase(
+      inMemoryQuoteRepository,
+      inMemoryCustomerRepository,
+    );
     addQuoteItem = new AddQuoteItemUseCase(inMemoryQuoteRepository);
     updateQuoteItem = new UpdateQuoteItemUseCase(inMemoryQuoteRepository);
     getQuote = new GetQuoteUseCase(inMemoryQuoteRepository);
   });
 
   test("should be able to update a quote item", async () => {
+    await createCustomer.execute({
+      customerId: "customer-123",
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "111111111",
+    });
+
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
     });
@@ -78,6 +94,13 @@ describe("Update Quote Item", () => {
   });
 
   test("should throw when quote item does not exist", async () => {
+    await createCustomer.execute({
+      customerId: "customer-123",
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "111111111",
+    });
+
     const { quote: createdQuote } = await createQuote.execute({
       customerId: "customer-123",
     });

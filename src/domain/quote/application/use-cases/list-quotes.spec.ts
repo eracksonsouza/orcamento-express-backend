@@ -1,23 +1,41 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
 import { CreateQuoteUseCase } from "./create-quote";
 import { QuoteStatus } from "../../enterprise/enums/quote-status";
 import { ListQuotesUseCase } from "./list-quotes";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
+let createCustomer: CreateCustomerUseCase;
 let createQuote: CreateQuoteUseCase;
 let listQuotes: ListQuotesUseCase;
+let phoneSequence: number;
 
 describe("List quotes", () => {
   beforeEach(() => {
     inMemoryQuoteRepository = new InMemoryQuoteRepository();
-    createQuote = new CreateQuoteUseCase(inMemoryQuoteRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
+    createQuote = new CreateQuoteUseCase(
+      inMemoryQuoteRepository,
+      inMemoryCustomerRepository,
+    );
     listQuotes = new ListQuotesUseCase(inMemoryQuoteRepository);
+    phoneSequence = 0;
   });
 
   async function createQuoteFixture(
     customerId: string,
     status: QuoteStatus = QuoteStatus.DRAFT,
   ): Promise<void> {
+    await createCustomer.execute({
+      customerId,
+      name: `Customer ${customerId}`,
+      email: `${customerId}@example.com`,
+      phone: `${++phoneSequence}`.padStart(9, "0"),
+    });
+
     const { quote } = await createQuote.execute({ customerId });
 
     if (status === QuoteStatus.DRAFT) {
