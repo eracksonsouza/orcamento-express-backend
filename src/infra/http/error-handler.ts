@@ -12,5 +12,6 @@ export function globalErrorHandler(
 
   return reply.status(statusCode).send({
     message: error.message,
+    code: statusCode >= 500 ? "INTERNAL_SERVER_ERROR" : "HTTP_ERROR",
   });
 }
