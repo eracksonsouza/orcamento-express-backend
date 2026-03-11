@@ -14,6 +14,7 @@ describe("Create Vehicle", () => {
   test("should be able create a vehicle", async () => {
     const { vehicle } = await sut.execute({
       vehicleId: "vehicle-123",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,

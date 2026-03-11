@@ -18,6 +18,7 @@ describe("Get Vehicle", () => {
   test("should be able to get a vehicle by id", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-123",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,

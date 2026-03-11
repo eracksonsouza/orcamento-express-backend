@@ -5,6 +5,7 @@ import type { VehicleType } from "../../enterprise/enums/vehicle-type";
 
 interface CreateVehicleRequest {
   vehicleId: string;
+  customerId: string;
   brand: string;
   model: string;
   year: number;
@@ -21,6 +22,7 @@ export class CreateVehicleUseCase {
 
   async execute({
     vehicleId,
+    customerId,
     brand,
     model,
     year,
@@ -29,6 +31,7 @@ export class CreateVehicleUseCase {
   }: CreateVehicleRequest): Promise<CreateVehicleResponse> {
     const vehicle = Vehicle.create(
       {
+        customerId,
         brand,
         model,
         year,

@@ -20,6 +20,7 @@ describe("Update Vehicle", () => {
   test("should be able to update a vehicle", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -29,6 +30,7 @@ describe("Update Vehicle", () => {
 
     await createVehicle.execute({
       vehicleId: "vehicle-2",
+      customerId: "customer-123",
       brand: "Honda",
       model: "Civic",
       year: 2022,
@@ -73,6 +75,7 @@ describe("Update Vehicle", () => {
   test("should be able to update only provided fields", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -99,6 +102,7 @@ describe("Update Vehicle", () => {
   test("should update type of vehicle", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -121,6 +125,7 @@ describe("Update Vehicle", () => {
   test("should update updatedAt when vehicle is updated", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,

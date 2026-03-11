@@ -19,6 +19,7 @@ describe("List Vehicles By Customer", () => {
 
     const { vehicle: vehicleOne } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId,
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -28,6 +29,7 @@ describe("List Vehicles By Customer", () => {
 
     const { vehicle: vehicleTwo } = await createVehicle.execute({
       vehicleId: "vehicle-2",
+      customerId,
       brand: "Honda",
       model: "Civic",
       year: 2022,
@@ -37,25 +39,13 @@ describe("List Vehicles By Customer", () => {
 
     const { vehicle: otherCustomerVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-3",
+      customerId: "customer-999",
       brand: "Yamaha",
       model: "Fazer",
       year: 2021,
       licensePlate: "GHI9012",
       type: VehicleType.MOTORCYCLE,
     });
-
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      customerId,
-      vehicleOne.id.toString(),
-    );
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      customerId,
-      vehicleTwo.id.toString(),
-    );
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      "customer-999",
-      otherCustomerVehicle.id.toString(),
-    );
 
     const result = await sut.execute({ customerId });
 
