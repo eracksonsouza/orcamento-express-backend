@@ -59,7 +59,9 @@ describe("List Vehicles By Customer", () => {
   });
 
   test("should return empty list when customer has no vehicles", async () => {
-    const result = await sut.execute({ customerId: "customer-without-vehicles" });
+    const result = await sut.execute({
+      customerId: "customer-without-vehicles",
+    });
 
     expect(result.vehicles).toHaveLength(0);
   });
