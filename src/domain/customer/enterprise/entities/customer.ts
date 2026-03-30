@@ -61,8 +61,8 @@ export class Customer extends Entity<CustomerProps> {
     const customer = new Customer(
       {
         name: props.name,
-        email: props.email ?? "", // Default to empty string
-        phone: props.phone ?? "", // Default to empty string
+        email: props.email ?? "",
+        phone: props.phone ?? "",
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },

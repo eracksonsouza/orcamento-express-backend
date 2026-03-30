@@ -5,7 +5,7 @@ import { EmailAlreadyInUseError } from "@/src/domain/customer/enterprise/errors/
 import { PhoneAlreadyInUseError } from "@/src/domain/customer/enterprise/errors/phone-already-in-use-error";
 
 interface CreateCustomerRequest {
-  customerId: string;
+  customerId?: string;
   name: string;
   email: string;
   phone: string;
