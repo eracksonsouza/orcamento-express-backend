@@ -29,7 +29,6 @@ export interface CreateVehicleProps {
 }
 
 export class Vehicle extends Entity<VehicleProps> {
-  items: any;
   get customerId(): string {
     return this.props.customerId;
   }
