@@ -39,14 +39,19 @@ model Quote {
   customerId String
   customer   Customer    @relation(fields: [customerId], references: [id])
 
+  vehicleId  String?
+  vehicle    Vehicle?    @relation(fields: [vehicleId], references: [id])
+
   version    Int         @default(1)
   status     QuoteStatus @default(DRAFT)
 
   // Cached totals (avoid recalculating every time)
-  subtotal   Decimal     @default(0)
-  discount   Decimal     @default(0)
-  taxes      Decimal     @default(0)
-  total      Decimal     @default(0)
+  subtotal        Decimal     @default(0)
+  discount        Decimal     @default(0)
+  taxes           Decimal     @default(0)
+  paymentDiscount Decimal     @default(0)
+  paymentMethod   String      @default("UNSPECIFIED")
+  total           Decimal     @default(0)
 
   items      QuoteItem[]
   files      QuoteFile[]
@@ -102,6 +107,8 @@ model Vehicle {
   year         Int
   licensePlate String
   type         String   // "CAR", "MOTORCYCLE", "TRUCK", "VAN", "SUV"
+
+  quotes       Quote[]
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
