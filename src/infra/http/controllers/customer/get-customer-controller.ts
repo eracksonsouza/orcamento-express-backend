@@ -1,10 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { GetCustomerUseCase } from "@/src/domain/customer/application/use-cases/get-customer";
-import {
-  customerIdParamsSchema,
-} from "../schemas/customer-schemas";
-import { toHttpCustomer } from "../presenters/customer-presenter";
+import { customerIdParamsSchema } from "../../schemas/customer-schemas";
+import { toHttpCustomer } from "../../presenters/customer-presenter";
 
 export class GetCustomerController {
   constructor(private getCustomerUseCase: GetCustomerUseCase) {}
