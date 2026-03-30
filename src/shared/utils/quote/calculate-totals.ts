@@ -3,7 +3,6 @@ import { QuoteItem } from "@/src/domain/quote/enterprise/entities/quote-item";
 export interface QuoteTotals {
   subtotal: number;
   total: number;
-  value: number;
 }
 
 export interface QuoteTotalsAdjustments {
@@ -27,6 +26,5 @@ export function calculateQuoteTotals(
   return {
     subtotal,
     total,
-    value: total,
   };
 }

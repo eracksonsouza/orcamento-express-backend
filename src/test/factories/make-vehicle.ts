@@ -10,6 +10,7 @@ export function makeVehicle(
 ) {
   const vehicle = Vehicle.create(
     {
+      customerId: "customer-1",
       brand: "Toyota",
       model: "Corolla",
       year: 2020,
