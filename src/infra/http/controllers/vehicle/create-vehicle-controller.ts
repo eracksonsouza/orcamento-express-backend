@@ -21,11 +21,12 @@ export class CreateVehicleController {
       });
     }
 
-    const { vehicleId, brand, model, year, licensePlate, type } =
+    const { vehicleId, customerId, brand, model, year, licensePlate, type } =
       parseResult.data;
 
     const { vehicle } = await this.createVehicleUseCase.execute({
       vehicleId,
+      customerId,
       brand,
       model,
       year,
