@@ -31,7 +31,7 @@ describe("Assign Vehicle To Quote", () => {
       inMemoryCustomerRepository,
     );
     getQuote = new GetQuoteUseCase(inMemoryQuoteRepository);
-    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository);
+    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository, inMemoryCustomerRepository);
     sut = new AssignVehicleToQuoteUseCase(
       inMemoryQuoteRepository,
       inMemoryVehicleRepository,

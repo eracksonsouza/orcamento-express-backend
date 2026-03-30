@@ -1,17 +1,24 @@
 import { InMemoryVehicleRepository } from "@/src/test/repositories/in-memory-vehicle-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { makeCustomer } from "@/src/test/factories/make-customer";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { VehicleType } from "../../enterprise/enums/vehicle-type";
 import { CreateVehicleUseCase } from "./create-vehicle";
 import { ListVehiclesByCustomerUseCase } from "./list-vehicles-by-customer";
 
 let inMemoryVehicleRepository: InMemoryVehicleRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
 let createVehicle: CreateVehicleUseCase;
 let sut: ListVehiclesByCustomerUseCase;
 
 describe("List Vehicles By Customer", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     inMemoryVehicleRepository = new InMemoryVehicleRepository();
-    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository, inMemoryCustomerRepository);
     sut = new ListVehiclesByCustomerUseCase(inMemoryVehicleRepository);
+    await inMemoryCustomerRepository.save(makeCustomer({}, new UniqueEntityId("customer-123")));
+    await inMemoryCustomerRepository.save(makeCustomer({}, new UniqueEntityId("customer-999")));
   });
 
   test("should be able to list vehicles by customer id", async () => {
