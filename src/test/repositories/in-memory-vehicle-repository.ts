@@ -1,6 +1,4 @@
-import type {
-  VehicleRepository,
-} from "@/src/domain/vehicle/application/repositories/vehicle-repository";
+import type { VehicleRepository } from "@/src/domain/vehicle/application/repositories/vehicle-repository";
 import type { Vehicle } from "@/src/domain/vehicle/enterprise/entities/vehicle";
 import type {
   PaginationParams,
@@ -9,8 +7,15 @@ import type {
 import { paginate } from "./helpers/paginate";
 
 export class InMemoryVehicleRepository implements VehicleRepository {
-  create(arg0: { vehicleId: string; brand: string; model: string; year: number; licensePlate: string; type: string; }) {
-      throw new Error("Method not implemented.");
+  create(arg0: {
+    vehicleId: string;
+    brand: string;
+    model: string;
+    year: number;
+    licensePlate: string;
+    type: string;
+  }) {
+    throw new Error("Method not implemented.");
   }
   public items: Vehicle[] = [];
   private vehiclesByCustomer: Map<string, Set<string>> = new Map();
@@ -26,6 +31,13 @@ export class InMemoryVehicleRepository implements VehicleRepository {
     }
 
     this.items.push(vehicle);
+
+    // Automatically track customer association from the entity
+    const customerId = vehicle.customerId;
+    const current =
+      this.vehiclesByCustomer.get(customerId) ?? new Set<string>();
+    current.add(vehicle.id.toString());
+    this.vehiclesByCustomer.set(customerId, current);
   }
 
   async findById(id: string): Promise<Vehicle | null> {
@@ -34,8 +46,9 @@ export class InMemoryVehicleRepository implements VehicleRepository {
 
   async findByLicensePlate(licensePlate: string): Promise<Vehicle | null> {
     return (
-      this.items.find((vehicle) => vehicle.licensePlate.value === licensePlate) ??
-      null
+      this.items.find(
+        (vehicle) => vehicle.licensePlate.value === licensePlate,
+      ) ?? null
     );
   }
 
@@ -46,7 +59,9 @@ export class InMemoryVehicleRepository implements VehicleRepository {
       return [];
     }
 
-    return this.items.filter((vehicle) => vehicleIds.has(vehicle.id.toString()));
+    return this.items.filter((vehicle) =>
+      vehicleIds.has(vehicle.id.toString()),
+    );
   }
 
   async findAll(params?: PaginationParams): Promise<PaginatedResult<Vehicle>> {
@@ -85,7 +100,8 @@ export class InMemoryVehicleRepository implements VehicleRepository {
   }
 
   attachVehicleToCustomer(customerId: string, vehicleId: string): void {
-    const current = this.vehiclesByCustomer.get(customerId) ?? new Set<string>();
+    const current =
+      this.vehiclesByCustomer.get(customerId) ?? new Set<string>();
     current.add(vehicleId);
     this.vehiclesByCustomer.set(customerId, current);
   }

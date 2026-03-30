@@ -48,6 +48,9 @@ export class Phone {
    * Formato brasileiro:
    * - Fixo: (XX) XXXX-XXXX (10 dígitos)
    * - Celular: (XX) 9XXXX-XXXX (11 dígitos)
+   *
+   * IMPORTANTE: Esta mesma regra deve ser refletida em phoneSchema
+   * (src/infra/http/schemas/customer-schemas.ts)
    */
   static isValid(phone: string): boolean {
     const digits = Phone.extractDigits(phone);

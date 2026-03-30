@@ -5,7 +5,6 @@ import {
   updateVehicleParamsSchema,
   updateVehicleBodySchema,
 } from "../../schemas/vehicle-schemas";
-import { toHttpVehicle } from "../../presenters/vehicle-presenter";
 
 export class UpdateVehicleController {
   constructor(private updateVehicleUseCase: UpdateVehicleUseCase) {}
@@ -39,15 +38,15 @@ export class UpdateVehicleController {
     const { id } = paramsResult.data;
     const { brand, model, year, licensePlate, type } = bodyResult.data;
 
-    const { vehicle } = await this.updateVehicleUseCase.execute({
+    const { vehicleId } = await this.updateVehicleUseCase.execute({
       vehicleId: id,
-      brand,
-      model,
-      year,
-      licensePlate,
-      type,
+      ...(brand !== undefined ? { brand } : {}),
+      ...(model !== undefined ? { model } : {}),
+      ...(year !== undefined ? { year } : {}),
+      ...(licensePlate !== undefined ? { licensePlate } : {}),
+      ...(type !== undefined ? { type } : {}),
     });
 
-    return reply.status(200).send({ vehicle: toHttpVehicle(vehicle) });
+    return reply.status(200).send({ vehicleId });
   };
 }

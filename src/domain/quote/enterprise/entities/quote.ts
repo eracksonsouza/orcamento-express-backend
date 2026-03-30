@@ -269,7 +269,7 @@ export class Quote extends Entity<QuoteProps> {
     });
     this.props.subtotal = totals.subtotal;
     this.props.total = totals.total;
-    this.props.value = totals.value;
+    this.props.value = totals.total;
   }
 
   private assertNonNegative(value: number, fieldName: string): void {

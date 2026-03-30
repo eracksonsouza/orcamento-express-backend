@@ -5,18 +5,10 @@ export class Slug {
     this.value = value;
   }
 
-  /* 
-    A static factory method to create a Slug instance from a given string.
-    It converts the string to a URL-friendly slug by:
-    - Converting to lowercase
-    - Trimming whitespace
-    - Removing non-word characters
-    - Replacing spaces and underscores with hyphens
-    - Removing leading and trailing hyphens
-    */
+  // Cria um slug amigável para URL.
   static create(text: string): Slug {
     const slug = text
-      .normalize("NFKD") // Normalize to decompose accented characters
+      .normalize("NFKD") // Normaliza caracteres acentuados
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, "") // Remove non-word characters

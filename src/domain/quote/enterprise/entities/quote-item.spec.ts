@@ -1,4 +1,4 @@
-import { QuoteItem } from "./quote-item";
+import { QuoteItem, type QuoteServiceCategory } from "./quote-item";
 import { QuoteItemType } from "@/src/domain/quote/enterprise/enums/quote-item-type";
 
 test("should validate quantity > 0", () => {
@@ -126,7 +126,7 @@ test("should validate service category values", () => {
       unitPrice: 120,
       quantity: 1,
       type: QuoteItemType.SERVICE,
-      serviceCategory: "POLIMENTO" as any,
+      serviceCategory: "POLIMENTO" as QuoteServiceCategory,
     }),
   ).toThrowError("Invalid service category: POLIMENTO");
 });

@@ -5,7 +5,6 @@ import {
   updateQuoteCommercialTermsParamsSchema,
   updateQuoteCommercialTermsBodySchema,
 } from "../../schemas/quote-schemas";
-import { toHttpQuote } from "../../presenters/quote-presenter";
 
 export class UpdateQuoteCommercialTermsController {
   constructor(
@@ -45,14 +44,14 @@ export class UpdateQuoteCommercialTermsController {
     const { id } = paramsResult.data;
     const { discount, taxes, paymentDiscount, paymentMethod } = bodyResult.data;
 
-    const { quote } = await this.updateQuoteCommercialTermsUseCase.execute({
+    const { quoteId } = await this.updateQuoteCommercialTermsUseCase.execute({
       quoteId: id,
-      discount,
-      taxes,
-      paymentDiscount,
-      paymentMethod,
+      ...(discount !== undefined ? { discount } : {}),
+      ...(taxes !== undefined ? { taxes } : {}),
+      ...(paymentDiscount !== undefined ? { paymentDiscount } : {}),
+      ...(paymentMethod !== undefined ? { paymentMethod } : {}),
     });
 
-    return reply.status(200).send({ quote: toHttpQuote(quote) });
+    return reply.status(200).send({ quoteId });
   };
 }

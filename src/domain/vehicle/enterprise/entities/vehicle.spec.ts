@@ -3,6 +3,7 @@ import { VehicleType } from "@/src/domain/vehicle/enterprise/enums/vehicle-type"
 
 describe("Vehicle", () => {
   const validProps = {
+    customerId: "customer-1",
     brand: "Toyota",
     model: "Corolla",
     year: 2023,

@@ -1,25 +1,32 @@
 import { InMemoryVehicleRepository } from "@/src/test/repositories/in-memory-vehicle-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { makeCustomer } from "@/src/test/factories/make-customer";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { GetVehicleUseCase } from "./get-vehicle";
 import { UpdateVehicleUseCase } from "./update-vehicle";
 import { CreateVehicleUseCase } from "./create-vehicle";
 import { VehicleNotFoundError } from "../../enterprise/errors/vehicle-not-found-error";
 
 let inMemoryVehicleRepository: InMemoryVehicleRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
 let createVehicle: CreateVehicleUseCase;
 let updateVehicle: UpdateVehicleUseCase;
 let getVehicle: GetVehicleUseCase;
 
 describe("Update Vehicle", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     inMemoryVehicleRepository = new InMemoryVehicleRepository();
-    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository, inMemoryCustomerRepository);
     updateVehicle = new UpdateVehicleUseCase(inMemoryVehicleRepository);
     getVehicle = new GetVehicleUseCase(inMemoryVehicleRepository);
+    await inMemoryCustomerRepository.save(makeCustomer({}, new UniqueEntityId("customer-123")));
   });
 
   test("should be able to update a vehicle", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -29,6 +36,7 @@ describe("Update Vehicle", () => {
 
     await createVehicle.execute({
       vehicleId: "vehicle-2",
+      customerId: "customer-123",
       brand: "Honda",
       model: "Civic",
       year: 2022,
@@ -73,6 +81,7 @@ describe("Update Vehicle", () => {
   test("should be able to update only provided fields", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -99,6 +108,7 @@ describe("Update Vehicle", () => {
   test("should update type of vehicle", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -121,6 +131,7 @@ describe("Update Vehicle", () => {
   test("should update updatedAt when vehicle is updated", async () => {
     const { vehicle: createdVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,

@@ -29,10 +29,10 @@ export class CreateNewQuoteVersionController {
 
     const { id } = parseResult.data;
 
-    const { newQuote } = await this.createNewQuoteVersionUseCase.execute({
+    const { quote } = await this.createNewQuoteVersionUseCase.execute({
       quoteId: id,
     });
 
-    return reply.status(201).send({ quote: toHttpQuote(newQuote) });
+    return reply.status(201).send({ quote: toHttpQuote(quote) });
   };
 }

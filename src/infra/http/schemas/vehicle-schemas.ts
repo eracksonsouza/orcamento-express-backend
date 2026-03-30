@@ -6,7 +6,8 @@ const uuidSchema = z.uuid();
 const currentYear = new Date().getFullYear();
 const maxVehicleYear = currentYear + 1;
 
-const licensePlateRegex = /^(?:[A-Z]{3}-?[0-9]{4}|[A-Z]{3}-?[0-9][A-Z][0-9]{2})$/;
+const licensePlateRegex =
+  /^(?:[A-Z]{3}-?[0-9]{4}|[A-Z]{3}-?[0-9][A-Z][0-9]{2})$/;
 
 const vehicleTypeSchema = z.enum(VehicleType);
 
@@ -39,6 +40,7 @@ export const customerIdParamsSchema = z
 export const createVehicleBodySchema = z
   .object({
     vehicleId: uuidSchema,
+    customerId: uuidSchema,
     brand: z.string().trim().min(1),
     model: z.string().trim().min(1),
     year: z.coerce.number().int().min(1900).max(maxVehicleYear),

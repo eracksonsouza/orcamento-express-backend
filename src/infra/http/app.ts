@@ -2,8 +2,7 @@ import fastify from "fastify";
 import fastifyCors from "@fastify/cors";
 
 import { globalErrorHandler } from "./error-handler";
-import { customerRoutes } from "./routes/customer-routes";
-import { vehicleRoutes } from "./routes/vehicle-routes";
+import { registerRoutes } from "./routes/index";
 
 export async function buildApp() {
   const app = fastify({
@@ -20,8 +19,7 @@ export async function buildApp() {
     return { status: "ok", timestamp: new Date().toISOString() };
   });
 
-  await app.register(customerRoutes);
-  await app.register(vehicleRoutes);
+  await registerRoutes(app);
 
   return app;
 }

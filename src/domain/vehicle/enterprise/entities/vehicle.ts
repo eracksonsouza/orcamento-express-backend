@@ -1,9 +1,13 @@
 import { Entity } from "@/src/core/entities/entity";
 import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
-import { VehicleType, isValidVehicleType } from "@/src/domain/vehicle/enterprise/enums/vehicle-type";
+import {
+  VehicleType,
+  isValidVehicleType,
+} from "@/src/domain/vehicle/enterprise/enums/vehicle-type";
 import { LicensePlate } from "@/src/domain/vehicle/enterprise/value-objects/license-plate";
 
 export interface VehicleProps {
+  customerId: string;
   brand: string;
   model: string;
   year: number;
@@ -14,6 +18,7 @@ export interface VehicleProps {
 }
 
 export interface CreateVehicleProps {
+  customerId: string;
   brand: string;
   model: string;
   year: number;
@@ -24,7 +29,10 @@ export interface CreateVehicleProps {
 }
 
 export class Vehicle extends Entity<VehicleProps> {
-  items: any;
+  get customerId(): string {
+    return this.props.customerId;
+  }
+
   get brand(): string {
     return this.props.brand;
   }
@@ -116,6 +124,7 @@ export class Vehicle extends Entity<VehicleProps> {
 
     return new Vehicle(
       {
+        customerId: props.customerId,
         brand: props.brand.trim(),
         model: props.model.trim(),
         year: props.year,

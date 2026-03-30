@@ -1,5 +1,22 @@
 import { z } from "zod";
 
+const ALLOWED_EMAIL_DOMAINS = [
+  "gmail.com",
+  "outlook.com",
+  "hotmail.com",
+  "yahoo.com",
+  "icloud.com",
+  "live.com",
+  "msn.com",
+  "protonmail.com",
+  "proton.me",
+];
+
+function isAllowedEmail(email: string) {
+  const domain = email.split("@")[1]?.toLowerCase() ?? "";
+  return domain.endsWith(".br") || ALLOWED_EMAIL_DOMAINS.includes(domain);
+}
+
 const uuidSchema = z.uuid();
 
 const optionalQueryStringSchema = z.preprocess(
@@ -27,9 +44,9 @@ export const customerIdParamsSchema = z
 
 export const createCustomerBodySchema = z
   .object({
-    customerId: uuidSchema,
+    customerId: uuidSchema.optional(),
     name: z.string().trim().min(1),
-    email: z.string().trim().email().max(254),
+    email: z.string().trim().email().max(254).refine(isAllowedEmail),
     phone: phoneSchema,
   })
   .strict();

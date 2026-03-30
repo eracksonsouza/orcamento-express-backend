@@ -31,7 +31,7 @@ describe("Assign Vehicle To Quote", () => {
       inMemoryCustomerRepository,
     );
     getQuote = new GetQuoteUseCase(inMemoryQuoteRepository);
-    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository);
+    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository, inMemoryCustomerRepository);
     sut = new AssignVehicleToQuoteUseCase(
       inMemoryQuoteRepository,
       inMemoryVehicleRepository,
@@ -59,17 +59,13 @@ describe("Assign Vehicle To Quote", () => {
 
     const { vehicle } = await createVehicle.execute({
       vehicleId: "vehicle-123",
+      customerId: "customer-123",
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
       licensePlate: "ABC1234",
       type: VehicleType.CAR,
     });
-
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      "customer-123",
-      vehicle.id.toString(),
-    );
 
     const response = await sut.execute({
       quoteId: quote.id.toString(),
@@ -114,17 +110,13 @@ describe("Assign Vehicle To Quote", () => {
 
     const { vehicle } = await createVehicle.execute({
       vehicleId: "vehicle-999",
+      customerId: "customer-456",
       brand: "Honda",
       model: "Civic",
       year: 2022,
       licensePlate: "XYZ9876",
       type: VehicleType.CAR,
     });
-
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      "customer-456",
-      vehicle.id.toString(),
-    );
 
     await expect(
       sut.execute({

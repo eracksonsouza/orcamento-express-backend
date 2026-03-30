@@ -1,17 +1,24 @@
 import { InMemoryVehicleRepository } from "@/src/test/repositories/in-memory-vehicle-repository";
+import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
+import { makeCustomer } from "@/src/test/factories/make-customer";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { VehicleType } from "../../enterprise/enums/vehicle-type";
 import { CreateVehicleUseCase } from "./create-vehicle";
 import { ListVehiclesByCustomerUseCase } from "./list-vehicles-by-customer";
 
 let inMemoryVehicleRepository: InMemoryVehicleRepository;
+let inMemoryCustomerRepository: InMemoryCustomerRepository;
 let createVehicle: CreateVehicleUseCase;
 let sut: ListVehiclesByCustomerUseCase;
 
 describe("List Vehicles By Customer", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     inMemoryVehicleRepository = new InMemoryVehicleRepository();
-    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository);
+    inMemoryCustomerRepository = new InMemoryCustomerRepository();
+    createVehicle = new CreateVehicleUseCase(inMemoryVehicleRepository, inMemoryCustomerRepository);
     sut = new ListVehiclesByCustomerUseCase(inMemoryVehicleRepository);
+    await inMemoryCustomerRepository.save(makeCustomer({}, new UniqueEntityId("customer-123")));
+    await inMemoryCustomerRepository.save(makeCustomer({}, new UniqueEntityId("customer-999")));
   });
 
   test("should be able to list vehicles by customer id", async () => {
@@ -19,6 +26,7 @@ describe("List Vehicles By Customer", () => {
 
     const { vehicle: vehicleOne } = await createVehicle.execute({
       vehicleId: "vehicle-1",
+      customerId,
       brand: "Toyota",
       model: "Corolla",
       year: 2023,
@@ -28,6 +36,7 @@ describe("List Vehicles By Customer", () => {
 
     const { vehicle: vehicleTwo } = await createVehicle.execute({
       vehicleId: "vehicle-2",
+      customerId,
       brand: "Honda",
       model: "Civic",
       year: 2022,
@@ -37,25 +46,13 @@ describe("List Vehicles By Customer", () => {
 
     const { vehicle: otherCustomerVehicle } = await createVehicle.execute({
       vehicleId: "vehicle-3",
+      customerId: "customer-999",
       brand: "Yamaha",
       model: "Fazer",
       year: 2021,
       licensePlate: "GHI9012",
       type: VehicleType.MOTORCYCLE,
     });
-
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      customerId,
-      vehicleOne.id.toString(),
-    );
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      customerId,
-      vehicleTwo.id.toString(),
-    );
-    inMemoryVehicleRepository.attachVehicleToCustomer(
-      "customer-999",
-      otherCustomerVehicle.id.toString(),
-    );
 
     const result = await sut.execute({ customerId });
 
@@ -69,7 +66,9 @@ describe("List Vehicles By Customer", () => {
   });
 
   test("should return empty list when customer has no vehicles", async () => {
-    const result = await sut.execute({ customerId: "customer-without-vehicles" });
+    const result = await sut.execute({
+      customerId: "customer-without-vehicles",
+    });
 
     expect(result.vehicles).toHaveLength(0);
   });

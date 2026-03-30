@@ -34,7 +34,7 @@ export class AddQuoteItemUseCase {
       unitPrice,
       quantity,
       type,
-      description,
+      ...(description !== undefined ? { description } : {}),
     });
 
     quote.addItem(quoteItem);

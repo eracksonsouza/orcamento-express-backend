@@ -33,6 +33,8 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
+// NOTE: Para testes de integração, use prismaTest de src/test/setup/prisma-test-client.ts
+// Este client é para uso em produção e development
 const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
