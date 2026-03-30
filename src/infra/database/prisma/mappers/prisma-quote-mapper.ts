@@ -18,16 +18,15 @@ export class PrismaQuoteMapper {
     return Quote.create(
       {
         customerId: raw.customerId,
-        value: Number(raw.total),
-        vehicleId: null,
+        vehicleId: raw.vehicleId ?? null,
         status: raw.status as QuoteStatus,
         version: raw.version,
         items: PrismaQuoteItemMapper.toDomainList(raw.items),
         subtotal: Number(raw.subtotal),
         discount: Number(raw.discount),
         taxes: Number(raw.taxes),
-        paymentDiscount: 0,
-        paymentMethod: "UNSPECIFIED",
+        paymentDiscount: Number(raw.paymentDiscount),
+        paymentMethod: raw.paymentMethod as Quote["paymentMethod"],
         total: Number(raw.total),
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt,
@@ -45,11 +44,14 @@ export class PrismaQuoteMapper {
     return {
       id: quote.id.toString(),
       customer: { connect: { id: quote.customerId } },
+      ...(quote.vehicleId ? { vehicle: { connect: { id: quote.vehicleId } } } : {}),
       version: quote.version,
       status: quote.status,
       subtotal: quote.subtotal,
       discount: quote.discount,
       taxes: quote.taxes,
+      paymentDiscount: quote.paymentDiscount,
+      paymentMethod: quote.paymentMethod,
       total: quote.total,
       createdAt: quote.createdAt,
       updatedAt: quote.updatedAt,
@@ -66,11 +68,14 @@ export class PrismaQuoteMapper {
    */
   static toUpdatePersistence(quote: Quote): Prisma.QuoteUpdateInput {
     return {
+      vehicle: quote.vehicleId ? { connect: { id: quote.vehicleId } } : { disconnect: true },
       version: quote.version,
       status: quote.status,
       subtotal: quote.subtotal,
       discount: quote.discount,
       taxes: quote.taxes,
+      paymentDiscount: quote.paymentDiscount,
+      paymentMethod: quote.paymentMethod,
       total: quote.total,
       updatedAt: quote.updatedAt,
       items: {

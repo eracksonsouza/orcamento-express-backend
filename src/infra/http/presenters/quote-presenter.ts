@@ -33,7 +33,7 @@ export function toHttpQuote(quote: Quote) {
     paymentDiscount: quote.paymentDiscount,
     paymentMethod: quote.paymentMethod,
     total: quote.total,
-    createdAt: quote.createdAt?.toISOString() ?? new Date().toISOString(),
-    updatedAt: quote.updatedAt?.toISOString() ?? new Date().toISOString(),
+    createdAt: quote.createdAt.toISOString(),
+    updatedAt: quote.updatedAt.toISOString(),
   };
 }
