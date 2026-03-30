@@ -24,8 +24,8 @@ export class CreateQuoteController {
     const { quoteId, customerId } = parseResult.data;
 
     const { quote } = await this.createQuoteUseCase.execute({
-      quoteId,
       customerId,
+      ...(quoteId !== undefined ? { quoteId } : {}),
     });
 
     return reply.status(201).send({ quote: toHttpQuote(quote) });

@@ -5,7 +5,6 @@ import {
   updateQuoteItemParamsSchema,
   updateQuoteItemBodySchema,
 } from "../../schemas/quote-schemas";
-import { toHttpQuote } from "../../presenters/quote-presenter";
 
 export class UpdateQuoteItemController {
   constructor(private updateQuoteItemUseCase: UpdateQuoteItemUseCase) {}
@@ -39,15 +38,15 @@ export class UpdateQuoteItemController {
     const { id, itemId } = paramsResult.data;
     const { unitPrice, quantity, type, description } = bodyResult.data;
 
-    const { quote } = await this.updateQuoteItemUseCase.execute({
+    const { quoteId } = await this.updateQuoteItemUseCase.execute({
       quoteId: id,
       itemId,
       unitPrice,
       quantity,
       type,
-      description,
+      ...(description !== undefined ? { description } : {}),
     });
 
-    return reply.status(200).send({ quote: toHttpQuote(quote) });
+    return reply.status(200).send({ quoteId });
   };
 }

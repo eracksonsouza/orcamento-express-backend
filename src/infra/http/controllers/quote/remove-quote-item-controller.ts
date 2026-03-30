@@ -2,7 +2,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { RemoveQuoteItemUseCase } from "@/src/domain/quote/application/use-cases/remove-quote-item";
 import { removeQuoteItemParamsSchema } from "../../schemas/quote-schemas";
-import { toHttpQuote } from "../../presenters/quote-presenter";
 
 export class RemoveQuoteItemController {
   constructor(private removeQuoteItemUseCase: RemoveQuoteItemUseCase) {}
@@ -25,11 +24,11 @@ export class RemoveQuoteItemController {
 
     const { id, itemId } = parseResult.data;
 
-    const { quote } = await this.removeQuoteItemUseCase.execute({
+    const { quoteId } = await this.removeQuoteItemUseCase.execute({
       quoteId: id,
       itemId,
     });
 
-    return reply.status(200).send({ quote: toHttpQuote(quote) });
+    return reply.status(200).send({ quoteId });
   };
 }

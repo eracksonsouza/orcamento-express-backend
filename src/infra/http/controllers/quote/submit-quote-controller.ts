@@ -2,7 +2,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { SubmitQuoteUseCase } from "@/src/domain/quote/application/use-cases/submit-quote";
 import { submitQuoteParamsSchema } from "../../schemas/quote-schemas";
-import { toHttpQuote } from "../../presenters/quote-presenter";
 
 export class SubmitQuoteController {
   constructor(private submitQuoteUseCase: SubmitQuoteUseCase) {}
@@ -25,10 +24,10 @@ export class SubmitQuoteController {
 
     const { id } = parseResult.data;
 
-    const { quote } = await this.submitQuoteUseCase.execute({
+    const { quoteId, status, version } = await this.submitQuoteUseCase.execute({
       quoteId: id,
     });
 
-    return reply.status(200).send({ quote: toHttpQuote(quote) });
+    return reply.status(200).send({ quoteId, status, version });
   };
 }
