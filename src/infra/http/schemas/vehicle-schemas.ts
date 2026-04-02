@@ -66,6 +66,14 @@ export const updateVehicleBodySchema = z
 
 export const deleteVehicleParamsSchema = vehicleIdParamsSchema;
 
+export const listVehiclesQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  perPage: z.coerce.number().int().min(1).max(100).optional().default(20),
+});
+
+export type ListVehiclesQuery = z.infer<typeof listVehiclesQuerySchema>;
+
 export type VehicleIdParams = z.infer<typeof vehicleIdParamsSchema>;
 export type CustomerVehiclesParams = z.infer<typeof customerIdParamsSchema>;
 export type CreateVehicleBody = z.infer<typeof createVehicleBodySchema>;

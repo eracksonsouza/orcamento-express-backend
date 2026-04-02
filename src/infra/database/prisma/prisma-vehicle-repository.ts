@@ -1,4 +1,4 @@
-import type { VehicleRepository } from "@/src/domain/vehicle/application/repositories/vehicle-repository";
+import type { VehicleRepository, VehicleWithCustomer } from "@/src/domain/vehicle/application/repositories/vehicle-repository";
 import type {
   PaginationParams,
   PaginatedResult,
@@ -77,6 +77,83 @@ export class PrismaVehicleRepository implements VehicleRepository {
 
     return {
       data: PrismaVehicleMapper.toDomainList(data),
+      total,
+      page,
+      perPage,
+      totalPages: Math.ceil(total / perPage),
+    };
+  }
+
+  async findAllWithCustomer(
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleWithCustomer>> {
+    const page = params?.page || 1;
+    const perPage = params?.perPage || 10;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.vehicle.findMany({
+        include: { customer: { select: { name: true } } },
+        skip: (page - 1) * perPage,
+        take: perPage,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.vehicle.count(),
+    ]);
+
+    return {
+      data: data.map((item) => ({
+        vehicle: PrismaVehicleMapper.toDomain(item),
+        customerName: item.customer.name,
+      })),
+      total,
+      page,
+      perPage,
+      totalPages: Math.ceil(total / perPage),
+    };
+  }
+
+  async searchWithCustomer(
+    query: string,
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleWithCustomer>> {
+    const page = params?.page || 1;
+    const perPage = params?.perPage || 10;
+    const normalizedQuery = query.trim();
+    const where = {
+      OR: [
+        { brand: { contains: normalizedQuery, mode: "insensitive" as const } },
+        { model: { contains: normalizedQuery, mode: "insensitive" as const } },
+        {
+          licensePlate: {
+            contains: normalizedQuery,
+            mode: "insensitive" as const,
+          },
+        },
+        { type: { contains: normalizedQuery, mode: "insensitive" as const } },
+        {
+          customer: {
+            name: { contains: normalizedQuery, mode: "insensitive" as const },
+          },
+        },
+      ],
+    };
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.vehicle.findMany({
+        where,
+        include: { customer: { select: { name: true } } },
+        skip: (page - 1) * perPage,
+        take: perPage,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.vehicle.count({ where }),
+    ]);
+
+    return {
+      data: data.map((item) => ({
+        vehicle: PrismaVehicleMapper.toDomain(item),
+        customerName: item.customer.name,
+      })),
       total,
       page,
       perPage,

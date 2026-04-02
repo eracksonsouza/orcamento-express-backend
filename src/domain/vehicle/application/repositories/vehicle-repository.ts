@@ -4,15 +4,27 @@ import type {
   PaginatedResult,
 } from "@/src/domain/customer/application/repositories/customer-repository";
 
+export type VehicleWithCustomer = {
+  vehicle: Vehicle;
+  customerName: string;
+};
+
 export interface VehicleRepository {
   findById(id: string): Promise<Vehicle | null>;
   findByLicensePlate(licensePlate: string): Promise<Vehicle | null>;
   findByCustomerId(customerId: string): Promise<Vehicle[]>;
   findAll(params?: PaginationParams): Promise<PaginatedResult<Vehicle>>;
+  findAllWithCustomer(
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleWithCustomer>>;
   search(
     query: string,
     params?: PaginationParams,
   ): Promise<PaginatedResult<Vehicle>>;
+  searchWithCustomer(
+    query: string,
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleWithCustomer>>;
   save(vehicle: Vehicle): Promise<void>;
   delete(id: string): Promise<void>;
   exists(id: string): Promise<boolean>;
