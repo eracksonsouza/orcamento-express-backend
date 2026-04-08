@@ -9,7 +9,7 @@ export function searchCustomers(
   return customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(normalizedQuery) ||
-      customer.email.toLowerCase().includes(normalizedQuery) ||
-      customer.phone.toLowerCase().includes(normalizedQuery),
+      customer.email?.toLowerCase().includes(normalizedQuery) ||
+      customer.phone?.toLowerCase().includes(normalizedQuery),
   );
 }
