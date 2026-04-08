@@ -1,19 +1,18 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
 import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
 import { CustomerNotFoundError } from "@/src/domain/customer/enterprise/errors/customer-not-found-error";
-import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
+import { makeCustomer } from "@/src/test/factories/make-customer";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { CreateQuoteUseCase } from "./create-quote";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
 let inMemoryCustomerRepository: InMemoryCustomerRepository;
-let createCustomer: CreateCustomerUseCase;
 let sut: CreateQuoteUseCase;
 
 describe("Create Quote", () => {
   beforeEach(() => {
     inMemoryQuoteRepository = new InMemoryQuoteRepository();
     inMemoryCustomerRepository = new InMemoryCustomerRepository();
-    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
     sut = new CreateQuoteUseCase(
       inMemoryQuoteRepository,
       inMemoryCustomerRepository,
@@ -21,12 +20,9 @@ describe("Create Quote", () => {
   });
 
   test("should be able create a quote", async () => {
-    await createCustomer.execute({
-      customerId: "customer-123",
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "111111111",
-    });
+    await inMemoryCustomerRepository.save(
+      makeCustomer({ name: "John Doe", email: "john@example.com", phone: "11111111111" }, new UniqueEntityId("customer-123")),
+    );
 
     const { quote } = await sut.execute({
       customerId: "customer-123",
@@ -37,12 +33,9 @@ describe("Create Quote", () => {
   });
 
   test("should create distinct quote ids for same customer", async () => {
-    await createCustomer.execute({
-      customerId: "customer-123",
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "111111111",
-    });
+    await inMemoryCustomerRepository.save(
+      makeCustomer({ name: "John Doe", email: "john@example.com", phone: "11111111111" }, new UniqueEntityId("customer-123")),
+    );
 
     const first = await sut.execute({
       customerId: "customer-123",

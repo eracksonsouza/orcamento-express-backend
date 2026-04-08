@@ -15,17 +15,15 @@ describe("List Customers", () => {
 
   test("should be able to list customers", async () => {
     await createCustomer.execute({
-      customerId: "1",
       name: "John Doe",
       email: "john@example.com",
-      phone: "111111111",
+      phone: "11111111111",
     });
 
     await createCustomer.execute({
-      customerId: "2",
       name: "Jane Doe",
       email: "jane@example.com",
-      phone: "222222222",
+      phone: "22222222222",
     });
 
     const result = await sut.execute();
@@ -45,17 +43,15 @@ describe("List Customers", () => {
 
   test("should be able to search customers by query", async () => {
     await createCustomer.execute({
-      customerId: "1",
       name: "John Doe",
       email: "john@example.com",
-      phone: "111111111",
+      phone: "11111111111",
     });
 
     await createCustomer.execute({
-      customerId: "2",
       name: "Jane Doe",
       email: "jane@example.com",
-      phone: "222222222",
+      phone: "22222222222",
     });
 
     const result = await sut.execute({

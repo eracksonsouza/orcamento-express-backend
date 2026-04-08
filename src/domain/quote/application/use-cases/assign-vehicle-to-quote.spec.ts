@@ -1,7 +1,8 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
 import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
 import { InMemoryVehicleRepository } from "@/src/test/repositories/in-memory-vehicle-repository";
-import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
+import { makeCustomer } from "@/src/test/factories/make-customer";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { CreateQuoteUseCase } from "./create-quote";
 import { GetQuoteUseCase } from "./get-quote";
 import { CreateVehicleUseCase } from "@/src/domain/vehicle/application/use-cases/create-vehicle";
@@ -13,7 +14,6 @@ import { AssignVehicleToQuoteUseCase } from "./assign-vehicle-to-quote";
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
 let inMemoryCustomerRepository: InMemoryCustomerRepository;
 let inMemoryVehicleRepository: InMemoryVehicleRepository;
-let createCustomer: CreateCustomerUseCase;
 let createQuote: CreateQuoteUseCase;
 let getQuote: GetQuoteUseCase;
 let createVehicle: CreateVehicleUseCase;
@@ -25,7 +25,6 @@ describe("Assign Vehicle To Quote", () => {
     inMemoryCustomerRepository = new InMemoryCustomerRepository();
     inMemoryVehicleRepository = new InMemoryVehicleRepository();
 
-    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
     createQuote = new CreateQuoteUseCase(
       inMemoryQuoteRepository,
       inMemoryCustomerRepository,
@@ -37,19 +36,12 @@ describe("Assign Vehicle To Quote", () => {
       inMemoryVehicleRepository,
     );
 
-    await createCustomer.execute({
-      customerId: "customer-123",
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "111111111",
-    });
-
-    await createCustomer.execute({
-      customerId: "customer-456",
-      name: "Jane Doe",
-      email: "jane@example.com",
-      phone: "222222222",
-    });
+    await inMemoryCustomerRepository.save(
+      makeCustomer({ name: "John Doe", email: "john@example.com", phone: "11111111111" }, new UniqueEntityId("customer-123")),
+    );
+    await inMemoryCustomerRepository.save(
+      makeCustomer({ name: "Jane Doe", email: "jane@example.com", phone: "22222222222" }, new UniqueEntityId("customer-456")),
+    );
   });
 
   test("should be able to assign a vehicle to quote when vehicle belongs to quote customer", async () => {
