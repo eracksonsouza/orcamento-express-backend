@@ -3,16 +3,16 @@ import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 
 export interface CustomerProps {
   name: string;
-  email: string;
-  phone: string;
+  email: string | null;
+  phone: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateCustomerProps {
   name: string;
-  email?: string;
-  phone?: string;
+  email?: string | null;
+  phone?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -22,11 +22,11 @@ export class Customer extends Entity<CustomerProps> {
     return this.props.name;
   }
 
-  get email(): string {
+  get email(): string | null {
     return this.props.email;
   }
 
-  get phone(): string {
+  get phone(): string | null {
     return this.props.phone;
   }
 
@@ -43,12 +43,12 @@ export class Customer extends Entity<CustomerProps> {
     this.touch();
   }
 
-  updateEmail(email: string): void {
+  updateEmail(email: string | null): void {
     this.props.email = email;
     this.touch();
   }
 
-  updatePhone(phone: string): void {
+  updatePhone(phone: string | null): void {
     this.props.phone = phone;
     this.touch();
   }
@@ -61,8 +61,8 @@ export class Customer extends Entity<CustomerProps> {
     const customer = new Customer(
       {
         name: props.name,
-        email: props.email ?? "",
-        phone: props.phone ?? "",
+        email: props.email ?? null,
+        phone: props.phone ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
@@ -71,5 +71,4 @@ export class Customer extends Entity<CustomerProps> {
 
     return customer;
   }
-  // ...existing code...
 }
