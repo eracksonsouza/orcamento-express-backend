@@ -12,8 +12,6 @@ function createPrismaClient(): PrismaClient {
   const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
-    // Return a placeholder that will fail on use - this allows imports to work
-    // but will throw when actually trying to use the client
     return new Proxy({} as PrismaClient, {
       get() {
         throw new Error("DATABASE_URL is not set");
@@ -33,8 +31,6 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-// NOTE: Para testes de integração, use prismaTest de src/test/setup/prisma-test-client.ts
-// Este client é para uso em produção e development
 const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
