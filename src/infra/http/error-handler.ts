@@ -9,15 +9,23 @@ import { EmptyQuoteError } from "@/src/domain/quote/enterprise/errors/empty-quot
 import { InvalidStatusTransitionError } from "@/src/domain/quote/enterprise/errors/invalid-status-transition-error";
 import { EmailAlreadyInUseError } from "@/src/domain/customer/enterprise/errors/email-already-in-use-error";
 import { PhoneAlreadyInUseError } from "@/src/domain/customer/enterprise/errors/phone-already-in-use-error";
+import { InvalidCredentialsError } from "@/src/domain/user/enterprise/errors/invalid-credentials-error";
+import { UserEmailAlreadyInUseError } from "@/src/domain/user/enterprise/errors/email-already-in-use-error";
+import { UserNotFoundError } from "@/src/domain/user/enterprise/errors/user-not-found-error";
 
 export function globalErrorHandler(
   error: FastifyError | Error,
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  request.log.error(error);
 
-  // Domain errors - 404
+  if (error instanceof InvalidCredentialsError || error instanceof UserNotFoundError) {
+    return reply.status(401).send({
+      message: error.message,
+      code: "UNAUTHORIZED",
+    });
+  }
+
   if (
     error instanceof CustomerNotFoundError ||
     error instanceof QuoteNotFoundError ||
@@ -29,7 +37,6 @@ export function globalErrorHandler(
     });
   }
 
-  // Domain errors - 400
   if (
     error instanceof InvalidQuoteItemError ||
     error instanceof EmptyQuoteError ||
@@ -41,11 +48,11 @@ export function globalErrorHandler(
     });
   }
 
-  // Domain errors - 409 (Conflict)
   if (
     error instanceof QuoteAlreadySubmittedError ||
     error instanceof EmailAlreadyInUseError ||
-    error instanceof PhoneAlreadyInUseError
+    error instanceof PhoneAlreadyInUseError ||
+    error instanceof UserEmailAlreadyInUseError
   ) {
     return reply.status(409).send({
       message: error.message,
@@ -53,7 +60,6 @@ export function globalErrorHandler(
     });
   }
 
-  // Zod validation errors
   if (error instanceof ZodError) {
     return reply.status(400).send({
       message: "Validation failed",
@@ -62,7 +68,6 @@ export function globalErrorHandler(
     });
   }
 
-  // Fastify errors
   if ("statusCode" in error && typeof error.statusCode === "number") {
     return reply.status(error.statusCode).send({
       message: error.message,
@@ -70,7 +75,7 @@ export function globalErrorHandler(
     });
   }
 
-  // Unknown errors
+  request.log.error(error);
   return reply.status(500).send({
     message: "Internal server error",
     code: "INTERNAL_SERVER_ERROR",
