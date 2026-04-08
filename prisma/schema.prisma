@@ -20,11 +20,50 @@ enum QuoteStatus {
   FAILED
 }
 
+enum UserRole {
+  ADMIN
+  MEMBER
+}
+
+enum QuoteItemType {
+  PART
+  SERVICE
+}
+
+enum VehicleType {
+  CAR
+  MOTORCYCLE
+  TRUCK
+  VAN
+  SUV
+}
+
+enum PaymentMethod {
+  UNSPECIFIED
+  CASH
+  CARD
+  BANK_TRANSFER
+  PIX
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  role          UserRole @default(MEMBER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
 model Customer {
   id      String  @id @default(uuid())
   name    String
-  email   String?
-  phone   String?
+  email   String? @unique
+  phone   String? @unique
   quotes  Quote[]
 
   createdAt DateTime @default(now())
@@ -50,7 +89,7 @@ model Quote {
   discount        Decimal     @default(0)
   taxes           Decimal     @default(0)
   paymentDiscount Decimal     @default(0)
-  paymentMethod   String      @default("UNSPECIFIED")
+  paymentMethod   PaymentMethod @default(UNSPECIFIED)
   total           Decimal     @default(0)
 
   items      QuoteItem[]
@@ -78,7 +117,7 @@ model QuoteItem {
   discount    Decimal  @default(0)
   taxes       Decimal  @default(0)
 
-  type        String   // "PART" or "SERVICE"
+  type        QuoteItemType
 
   @@map("quote_items")
 }
@@ -105,8 +144,8 @@ model Vehicle {
   brand         String
   model        String
   year         Int
-  licensePlate String
-  type         String   // "CAR", "MOTORCYCLE", "TRUCK", "VAN", "SUV"
+  licensePlate String      @unique
+  type         VehicleType
 
   quotes       Quote[]
 
@@ -114,9 +153,4 @@ model Vehicle {
   updatedAt    DateTime @updatedAt
 
   @@map("vehicles")
-}
-
-enum QuoteItemType {
-  PART
-  SERVICE
 }
