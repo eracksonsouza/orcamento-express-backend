@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { verifyJWT } from "../middlewares/verify-jwt";
 import { CreateVehicleController } from "../controllers/vehicle/create-vehicle-controller";
 import { GetVehicleController } from "../controllers/vehicle/get-vehicle-controller";
 import { ListVehiclesController } from "../controllers/vehicle/list-vehicles-controller";
@@ -13,6 +14,8 @@ import { makeUpdateVehicleUseCase } from "../factories/make-update-vehicle-use-c
 import { makeDeleteVehicleUseCase } from "../factories/make-delete-vehicle-use-case";
 
 export async function vehicleRoutes(app: FastifyInstance) {
+  app.addHook("preHandler", verifyJWT);
+
   const createVehicleController = new CreateVehicleController(
     makeCreateVehicleUseCase(),
   );
