@@ -5,15 +5,14 @@ export class Slug {
     this.value = value;
   }
 
-  // Cria um slug amigável para URL.
   static create(text: string): Slug {
     const slug = text
-      .normalize("NFKD") // Normaliza caracteres acentuados
+      .normalize("NFKD")
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, "") // Remove non-word characters
-      .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with hyphens
-      .replace(/^-+|-+$/g, ""); // Remove leading and trailing hyphens
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
     return new Slug(slug);
   }

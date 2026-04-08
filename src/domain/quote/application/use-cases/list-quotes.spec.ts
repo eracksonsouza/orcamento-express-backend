@@ -1,40 +1,40 @@
 import { InMemoryQuoteRepository } from "@/src/test/repositories/in-memory-quote-repository";
 import { InMemoryCustomerRepository } from "@/src/test/repositories/in-memory-customer-repository";
-import { CreateCustomerUseCase } from "@/src/domain/customer/application/use-cases/create-customer";
+import { makeCustomer } from "@/src/test/factories/make-customer";
+import { UniqueEntityId } from "@/src/core/entities/unique-entity-id";
 import { CreateQuoteUseCase } from "./create-quote";
 import { QuoteStatus } from "../../enterprise/enums/quote-status";
 import { ListQuotesUseCase } from "./list-quotes";
 
 let inMemoryQuoteRepository: InMemoryQuoteRepository;
 let inMemoryCustomerRepository: InMemoryCustomerRepository;
-let createCustomer: CreateCustomerUseCase;
 let createQuote: CreateQuoteUseCase;
 let listQuotes: ListQuotesUseCase;
-let phoneSequence: number;
+let customerSequence: number;
 
 describe("List quotes", () => {
   beforeEach(() => {
     inMemoryQuoteRepository = new InMemoryQuoteRepository();
     inMemoryCustomerRepository = new InMemoryCustomerRepository();
-    createCustomer = new CreateCustomerUseCase(inMemoryCustomerRepository);
     createQuote = new CreateQuoteUseCase(
       inMemoryQuoteRepository,
       inMemoryCustomerRepository,
     );
     listQuotes = new ListQuotesUseCase(inMemoryQuoteRepository);
-    phoneSequence = 0;
+    customerSequence = 0;
   });
 
   async function createQuoteFixture(
     customerId: string,
     status: QuoteStatus = QuoteStatus.DRAFT,
   ): Promise<void> {
-    await createCustomer.execute({
-      customerId,
-      name: `Customer ${customerId}`,
-      email: `${customerId}@example.com`,
-      phone: `${++phoneSequence}`.padStart(9, "0"),
-    });
+    const seq = ++customerSequence;
+    await inMemoryCustomerRepository.save(
+      makeCustomer(
+        { name: `Customer ${customerId}`, email: `customer${seq}@example.com`, phone: `${seq}`.padStart(11, "0") },
+        new UniqueEntityId(customerId),
+      ),
+    );
 
     const { quote } = await createQuote.execute({ customerId });
 

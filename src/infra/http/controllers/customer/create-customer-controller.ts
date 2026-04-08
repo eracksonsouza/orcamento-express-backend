@@ -21,13 +21,12 @@ export class CreateCustomerController {
       });
     }
 
-    const { customerId, name, email, phone } = parseResult.data;
+    const { name, email, phone } = parseResult.data;
 
     const { customer } = await this.createCustomerUseCase.execute({
-      customerId,
       name,
-      email,
-      phone,
+      email: email ?? null,
+      phone: phone ?? null,
     });
 
     return reply.status(201).send({ customer: toHttpCustomer(customer) });

@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { verifyJWT } from "../middlewares/verify-jwt";
 import { CreateQuoteController } from "../controllers/quote/create-quote-controller";
 import { GetQuoteController } from "../controllers/quote/get-quote-controller";
 import { ListQuotesController } from "../controllers/quote/list-quotes-controller";
@@ -19,6 +20,8 @@ import { makeSubmitQuoteUseCase } from "../factories/make-submit-quote-use-case"
 import { makeCreateNewQuoteVersionUseCase } from "../factories/make-create-new-quote-version-use-case";
 
 export async function quoteRoutes(app: FastifyInstance) {
+  app.addHook("preHandler", verifyJWT);
+
   const createQuoteController = new CreateQuoteController(
     makeCreateQuoteUseCase(),
   );

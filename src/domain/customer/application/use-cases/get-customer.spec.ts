@@ -16,10 +16,9 @@ describe("Get Customer", () => {
 
   test("should be able to get a customer by id", async () => {
     const { customer: createdCustomer } = await createCustomer.execute({
-      customerId: "123",
       name: "John Doe",
       email: "john.doe@example.com",
-      phone: "123-456-7890",
+      phone: "1234567890",
     });
 
     const { customer } = await sut.execute({

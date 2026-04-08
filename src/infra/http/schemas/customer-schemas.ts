@@ -44,10 +44,17 @@ export const customerIdParamsSchema = z
 
 export const createCustomerBodySchema = z
   .object({
-    customerId: uuidSchema.optional(),
     name: z.string().trim().min(1),
-    email: z.string().trim().email().max(254).refine(isAllowedEmail),
-    phone: phoneSchema,
+    email: z.string().trim().email().max(254).refine(isAllowedEmail).optional(),
+    phone: phoneSchema.optional(),
+  })
+  .strict();
+
+export const updateCustomerBodySchema = z
+  .object({
+    name: z.string().trim().min(1).optional(),
+    email: z.string().trim().email().max(254).refine(isAllowedEmail).optional().nullable(),
+    phone: phoneSchema.optional().nullable(),
   })
   .strict();
 

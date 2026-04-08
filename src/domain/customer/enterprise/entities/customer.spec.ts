@@ -98,12 +98,12 @@ describe("Customer", () => {
     expect(customer.phone).toBe("");
   });
 
-  test("should create customer with optional email and phone as undefined", () => {
+  test("should create customer with optional email and phone as null when not provided", () => {
     const customer = Customer.create({
       name: "John Doe",
     });
 
-    expect(customer.email).toBe("");
-    expect(customer.phone).toBe("");
+    expect(customer.email).toBeNull();
+    expect(customer.phone).toBeNull();
   });
 });

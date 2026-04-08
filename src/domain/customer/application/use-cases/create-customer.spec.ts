@@ -15,10 +15,9 @@ describe("Create Customer", () => {
 
   test("should be able create a customer", async () => {
     const { customer } = await sut.execute({
-      customerId: "123",
       name: "John Doe",
       email: "john.doe@example.com",
-      phone: "123-456-7890",
+      phone: "1234567890",
     });
 
     expect(customer.id).toBeTruthy();
@@ -33,7 +32,6 @@ describe("Create Customer", () => {
 
     await expect(
       sut.execute({
-        customerId: "new-customer-id",
         name: "New Customer",
         email: "duplicate@example.com",
         phone: "11999999999",
@@ -49,29 +47,10 @@ describe("Create Customer", () => {
 
     await expect(
       sut.execute({
-        customerId: "new-customer-id",
         name: "New Customer",
         email: "newcustomer@example.com",
         phone: "11999999999",
       }),
     ).rejects.toThrow(PhoneAlreadyInUseError);
-  });
-
-  test("should allow same customer to update without triggering duplicate validation", async () => {
-    const existingCustomer = makeCustomer({
-      email: "customer@example.com",
-      phone: "11999999999",
-    });
-    await inMemoryCustomerRepository.save(existingCustomer);
-
-    // Same customer ID updating their own data should work
-    const { customer } = await sut.execute({
-      customerId: existingCustomer.id.toString(),
-      name: "Updated Name",
-      email: "customer@example.com",
-      phone: "11999999999",
-    });
-
-    expect(customer.name).toBe("Updated Name");
   });
 });

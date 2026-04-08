@@ -129,7 +129,6 @@ export class PrismaVehicleRepository implements VehicleRepository {
             mode: "insensitive" as const,
           },
         },
-        { type: { contains: normalizedQuery, mode: "insensitive" as const } },
         {
           customer: {
             name: { contains: normalizedQuery, mode: "insensitive" as const },
@@ -178,7 +177,6 @@ export class PrismaVehicleRepository implements VehicleRepository {
             mode: "insensitive" as const,
           },
         },
-        { type: { contains: normalizedQuery, mode: "insensitive" as const } },
       ],
     };
 
