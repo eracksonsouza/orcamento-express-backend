@@ -1,4 +1,7 @@
-import type { VehicleRepository } from "@/src/domain/vehicle/application/repositories/vehicle-repository";
+import type {
+  VehicleRepository,
+  VehicleWithCustomer,
+} from "@/src/domain/vehicle/application/repositories/vehicle-repository";
 import type { Vehicle } from "@/src/domain/vehicle/enterprise/entities/vehicle";
 import type {
   PaginationParams,
@@ -68,6 +71,14 @@ export class InMemoryVehicleRepository implements VehicleRepository {
     return paginate({ items: this.items, ...(params && { params }) });
   }
 
+  async findAllWithCustomer(
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleWithCustomer>> {
+    return this.mapWithCustomer(
+      paginate({ items: this.items, ...(params && { params }) }),
+    );
+  }
+
   async search(
     query: string,
     params?: PaginationParams,
@@ -83,6 +94,14 @@ export class InMemoryVehicleRepository implements VehicleRepository {
     );
 
     return paginate({ items: filteredItems, ...(params && { params }) });
+  }
+
+  async searchWithCustomer(
+    query: string,
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleWithCustomer>> {
+    const result = await this.search(query, params);
+    return this.mapWithCustomer(result);
   }
 
   async delete(id: string): Promise<void> {
@@ -104,5 +123,17 @@ export class InMemoryVehicleRepository implements VehicleRepository {
       this.vehiclesByCustomer.get(customerId) ?? new Set<string>();
     current.add(vehicleId);
     this.vehiclesByCustomer.set(customerId, current);
+  }
+
+  private mapWithCustomer(
+    result: PaginatedResult<Vehicle>,
+  ): PaginatedResult<VehicleWithCustomer> {
+    return {
+      ...result,
+      data: result.data.map((vehicle) => ({
+        vehicle,
+        customerName: "",
+      })),
+    };
   }
 }
